@@ -3,7 +3,7 @@ title: iOS dyld 前世今生
 description: >-
   dyld(The Dynamic Linker/Loader)动态链接(加载)器，是操作系统的重要组成部分，在 macOS 系统中，dyld 位于 `Macintosh HD/usr/lib/dyld`。 
 abbrlink: c2aae680
-date: 2020-03-09 16:33:55
+date: 2020-04-10 16:33:55
 tags:
 ---
 
