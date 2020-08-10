@@ -5,10 +5,11 @@ date: 2017-12-12 10:54:26
 tags:
 ---
 
-
 - 在UML类图中常见的有以下几种关系: `泛化(Generalization)`、`实现(Realization)`、`组合(Composition)`、`聚合(Aggregation)`、`关联(Association)`、`依赖(Dependency)`。
 - 各种关系的强弱顺序：
 　　泛化 = 实现 > 组合 > 聚合 > 关联 > 依赖
+
+<!-- more -->
 
 > **1、泛化(Generalization)关系**
 - 关系简述:
@@ -16,7 +17,10 @@ tags:
   - `泛化关系`是一种`继承关系`，用于描述父类与子类之间的关系。例如：`学生`属于`人类`，他即有学生的特性也有人类的共性。  
 
 - 关系图形：
-  - 带空心三角箭头的实线，箭头指向父类。![泛化关系](http://upload-images.jianshu.io/upload_images/590107-c68df27417e7827f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+  - 带空心三角箭头的实线，箭头指向父类。
+
+  ![泛化关系](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/泛化关系.png)
+
 
 
 > **2、实现(Realization)关系**
@@ -24,7 +28,8 @@ tags:
   - 实现关系是一种类与接口的关系，表示类是接口所有特征和行为的实现，在这种关系中，类实现了接口，类中的操作实现了接口中所声明的操作
 
 - 关系图形
-  - 带空心三角箭头的虚线，箭头指向接口。![实现关系](http://upload-images.jianshu.io/upload_images/590107-337b381d9b469173.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+  - 带空心三角箭头的虚线，箭头指向接口。
+  ![实现关系](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/实现关系.png)
 
 > **3、组合(Composition)关系**
 - 关系简述：
@@ -33,7 +38,8 @@ tags:
   - 组合关系中部分和整体具有统一的生存期。一旦整体对象不存在，部分对象也将不存在，部分对象与整体对象之间具有`同生共死`的关系。
 
 - 关系图形：
-  - 带实心菱形的直线，菱形指向整体。![组合关系](http://upload-images.jianshu.io/upload_images/590107-1a598cc7cdb44f47.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+  - 带实心菱形的直线，菱形指向整体。
+  ![组合关系](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/组合关系.png)
 
 > **4、聚合(Aggregation)关系**
 - 关系简述：
@@ -43,7 +49,8 @@ tags:
   
 
 - 关系图形：
-  - 带空心菱形的直线，菱形指向整体。![聚合关系](http://upload-images.jianshu.io/upload_images/590107-c924b7fb6b293c3c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+  - 带空心菱形的直线，菱形指向整体。
+  ![聚合关系](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/聚合关系.png)
 
 > **5、关联(Association)关系**
 - 关系简述：
@@ -60,7 +67,8 @@ tags:
 - 关系图形：
   - 带普通箭头的实心线，指向被拥有者。
   - 双箭头或不使用箭头表示双向关联。
-  - 单箭头表示单向关联。![关联关系](http://upload-images.jianshu.io/upload_images/590107-899052c9a3b28421.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+  - 单箭头表示单向关联。
+  ![关联关系](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/关联关系.png)
 
 
 
@@ -73,7 +81,8 @@ tags:
   - 局部变量、方法中的参数和对静态方法的调用。
 
 - 关系图形：
-  - 依赖关系用带普通箭头的虚线表示，由依赖的一方指向被依赖的一方。![依赖关系](http://upload-images.jianshu.io/upload_images/590107-3869b6754bb52a87.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+  - 依赖关系用带普通箭头的虚线表示，由依赖的一方指向被依赖的一方。
+  ![依赖关系](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/依赖关系.png)
 
 ### 组合、聚合、关联、依赖的总结与区别
 - 组合关系是关联关系的一种特例，这种关系比聚合更强，也称为强聚合；整体与部分是不可分的，整体的生命周期结束也就意味着部分的生命周期结束；例如：人与人的头和身体；
@@ -88,7 +97,4 @@ tags:
  
 - github地址：https://github.com/rs/SDWebImage
 
-![SDWebImageClassDiagram.png](http://upload-images.jianshu.io/upload_images/590107-5a656e6c9f082724.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-
-
+![SDWebImageClassDiagram](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/SDWebImageClassDiagram.png)
