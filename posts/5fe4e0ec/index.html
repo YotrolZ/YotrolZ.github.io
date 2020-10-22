@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="iOS中拉伸图片的几种方式"/><link rel="alternate" href="/atom.xml" title="YotrolZ" type="application/atom+xml"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
+<link rel="canonical" href="http://yotrolz.com/posts/5fe4e0ec/"/>
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-138610487-3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-138610487-3');
+</script><script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":"","latex":false};
+</script>
+
+    <title>iOS中拉伸图片的几种方式 - YotrolZ</title>
+  <meta name="generator" content="Hexo 5.2.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">YotrolZ</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">Home
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">YotrolZ</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            Home
+            </a>
+        </li>
+      </ul></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">iOS中拉伸图片的几种方式
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2015-06-30
+        </span><span class="post-category">
+            <a href="/categories/iOS/">iOS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>假如下面的一张图片，是用来做按钮的背景图片的，原始尺寸是(<code>128 * 112</code>)<br><img src="https://raw.githubusercontent.com/YotrolZ/hexo/master/img/590107-af6c569c9bf6a0f2.png" alt="按钮背景图片.png"></p>
+<p>我们通过代码将这张图片设置为按钮的背景图片，假如我们将创建好的按钮的宽高设置为:(<code>W=200, H=50</code>)代码如下:</p>
+<a id="more"></a>
+
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//  ViewController.m</span></span><br><span class="line"><span class="comment">//  iOS图片拉伸总结</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//  Copyright (c) 2015年 YotrolZ. All rights reserved.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#import <span class="meta-string">&quot;ViewController.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> ()</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 创建一个按钮</span></span><br><span class="line">    <span class="built_in">UIButton</span> *btn = [<span class="built_in">UIButton</span> buttonWithType:<span class="built_in">UIButtonTypeCustom</span>];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置按钮的frame</span></span><br><span class="line">    btn.frame = <span class="built_in">CGRectMake</span>(<span class="number">100</span>, <span class="number">300</span>, <span class="number">200</span>, <span class="number">50</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 加载图片</span></span><br><span class="line">    <span class="built_in">UIImage</span> *image = [<span class="built_in">UIImage</span> imageNamed:<span class="string">@&quot;chat_send_nor&quot;</span>];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 设置按钮的背景图片</span></span><br><span class="line">    [btn setBackgroundImage:image forState:<span class="built_in">UIControlStateNormal</span>];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 将按钮添加到控制器的view</span></span><br><span class="line">    [<span class="keyword">self</span>.view addSubview:btn];</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)didReceiveMemoryWarning &#123;</span><br><span class="line">    [<span class="keyword">super</span> didReceiveMemoryWarning];</span><br><span class="line">    <span class="comment">// Dispose of any resources that can be recreated.</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>这时你发现运行的结果完全出乎你的意料(搓的无极限)，如图：<br><img src="https://raw.githubusercontent.com/YotrolZ/hexo/master/img/590107-36ac3f2984c15fb5.png" alt="运行效果图1.png"></p>
+<p>原因分析:是将原是尺寸为<code>W=128 * H=112</code>的图片拉伸成了<code>W=200, H=50</code>;<br>解决方案:<br>1.找美工MM重做一张<code>较大</code>的图片,这样的话就会出现软件包将来会变大，占用空间更大;如果我们要经常修改按钮的<code>frame</code>,你是想让MM杀你的节奏~~,显然不可行；<br>2.苹果为我们提供了关于图片拉伸的API，我们可以直接利用代码实现，是不是很牛X；</p>
+<p>利用苹果提供的API来拉伸图片(目前发现的有四种):<br>一、 方式一(iOS5之前)：<br>如下图：设置<code>topCapHeight</code>、<code>leftCapWidth</code>、<code>bottomCapHeight</code>、<code>lerightCapWidth</code>,图中的黑色区域就是图片拉伸的范围，也就是说边上的不会被拉伸.<br>通过下面的方法我们可以设置:</p>
+<p>// 官方API说明<br>// <del>- stretchableImageWithLeftCapWidth:topCapHeight:(iOS 5.0)</del><br>// Creates and returns a new image object with the specified cap values.</p>
+<p>说明:这个方法只有2个参数，<code>leftCapWidth</code>代表左端盖宽度，<code>topCapHeight</code>代表上端盖高度。<code>系统会自动计算</code>出右端盖宽度<code>rightCapWidth</code>和底端盖高度<code>bottomCapHeight</code>，算法如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 系统会自动计算rightCapWidth</span></span><br><span class="line">rightCapWidth = image.width - leftCapWidth - <span class="number">1</span>;  </span><br><span class="line">  </span><br><span class="line"><span class="comment">// 系统会自动计算bottomCapHeight</span></span><br><span class="line">bottomCapHeight = image.height - topCapHeight - <span class="number">1</span> </span><br></pre></td></tr></table></figure>
+
+<p>这样一来，其实我们图片的可拉伸范围只有<code>1 * 1</code>，所以再怎么拉伸都不会影响图片的外观;<br>具体代码如下:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 加载图片</span></span><br><span class="line"><span class="built_in">UIImage</span> *image = [<span class="built_in">UIImage</span> imageNamed:<span class="string">@&quot;chat_send_nor&quot;</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置左边端盖宽度</span></span><br><span class="line"><span class="built_in">NSInteger</span> leftCapWidth = image.size.width * <span class="number">0.5</span>;</span><br><span class="line"><span class="comment">// 设置上边端盖高度</span></span><br><span class="line"><span class="built_in">NSInteger</span> topCapHeight = image.size.height * <span class="number">0.5</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">UIImage</span> *newImage = [image stretchableImageWithLeftCapWidth:leftCapWidth topCapHeight:topCapHeight];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置按钮的背景图片</span></span><br><span class="line">[btn setBackgroundImage:newImage forState:<span class="built_in">UIControlStateNormal</span>];</span><br></pre></td></tr></table></figure>
+
+<p>运行效果:<br><img src="https://raw.githubusercontent.com/YotrolZ/hexo/master/img/590107-b7130e0c0353f44a.png" alt="运行效果图2.png"></p>
+<p>方式二:(iOS5)<br>利用下面的方法：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 官方API说明</span></span><br><span class="line">- (<span class="built_in">UIImage</span> *)resizableImageWithCapInsets:(<span class="built_in">UIEdgeInsets</span>)capInsets <span class="built_in">NS_AVAILABLE_IOS</span>(<span class="number">5</span>_0); </span><br><span class="line"><span class="comment">// create a resizable version of this image. the interior is tiled when drawn.</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="built_in">UIEdgeInsets</span> &#123;</span><br><span class="line">    <span class="built_in">CGFloat</span> top, left, bottom, right;  </span><br><span class="line">    <span class="comment">// specify amount to inset (positive) for each of the edges. values can be negative to &#x27;outset&#x27;</span></span><br><span class="line">&#125; <span class="built_in">UIEdgeInsets</span>;</span><br></pre></td></tr></table></figure>
+
+<p>说明：<code>UIEdgeInsets</code>中的<code>CGFloat top, left, bottom, right</code>就是用来设置上端盖、左端盖、下端盖、右端盖的尺寸(<code>逆时针方向</code>);</p>
+<p>具体代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 加载图片</span></span><br><span class="line"><span class="built_in">UIImage</span> *image = [<span class="built_in">UIImage</span> imageNamed:<span class="string">@&quot;chat_send_nor&quot;</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置端盖的值</span></span><br><span class="line"><span class="built_in">CGFloat</span> top = image.size.height * <span class="number">0.5</span>;</span><br><span class="line"><span class="built_in">CGFloat</span> left = image.size.width * <span class="number">0.5</span>;</span><br><span class="line"><span class="built_in">CGFloat</span> bottom = image.size.height * <span class="number">0.5</span>;</span><br><span class="line"><span class="built_in">CGFloat</span> right = image.size.width * <span class="number">0.5</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">UIEdgeInsets</span> edgeInsets = <span class="built_in">UIEdgeInsetsMake</span>(top, left, bottom, right);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 拉伸图片</span></span><br><span class="line"><span class="built_in">UIImage</span> *newImage = [image resizableImageWithCapInsets:edgeInsets];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置按钮的背景图片</span></span><br><span class="line">[btn setBackgroundImage:newImage forState:<span class="built_in">UIControlStateNormal</span>];</span><br></pre></td></tr></table></figure>
+
+<p>运行效果:<br><img src="https://raw.githubusercontent.com/YotrolZ/hexo/master/img/590107-05a4d05c162a415b.png" alt="运行效果图3.png"></p>
+<p>方式三:（iOS6）<br>利用下面的方法:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">UIImage</span> *)resizableImageWithCapInsets:(<span class="built_in">UIEdgeInsets</span>)capInsets resizingMode:(<span class="built_in">UIImageResizingMode</span>)resizingMode <span class="built_in">NS_AVAILABLE_IOS</span>(<span class="number">6</span>_0); </span><br><span class="line"><span class="comment">// the interior is resized according to the resizingMode</span></span><br></pre></td></tr></table></figure>
+
+<p>说明:相比iOS5中的方法多了一个<code>resizingMode</code>参数</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_ENUM</span>(<span class="built_in">NSInteger</span>, <span class="built_in">UIImageResizingMode</span>) &#123;</span><br><span class="line">    <span class="built_in">UIImageResizingModeTile</span>, <span class="comment">// 平铺模式，通过重复显示UIEdgeInsets指定的矩形区域来填充图片</span></span><br><span class="line">    <span class="built_in">UIImageResizingModeStretch</span>, <span class="comment">// 拉伸模式，通过拉伸UIEdgeInsets指定的矩形区域来填充图片</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>具体代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 加载图片</span></span><br><span class="line"><span class="built_in">UIImage</span> *image = [<span class="built_in">UIImage</span> imageNamed:<span class="string">@&quot;chat_send_nor&quot;</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置端盖的值</span></span><br><span class="line"><span class="built_in">CGFloat</span> top = image.size.height * <span class="number">0.5</span>;</span><br><span class="line"><span class="built_in">CGFloat</span> left = image.size.width * <span class="number">0.5</span>;</span><br><span class="line"><span class="built_in">CGFloat</span> bottom = image.size.height * <span class="number">0.5</span>;</span><br><span class="line"><span class="built_in">CGFloat</span> right = image.size.width * <span class="number">0.5</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置端盖的值</span></span><br><span class="line"><span class="built_in">UIEdgeInsets</span> edgeInsets = <span class="built_in">UIEdgeInsetsMake</span>(top, left, bottom, right);</span><br><span class="line"><span class="comment">// 设置拉伸的模式</span></span><br><span class="line"><span class="built_in">UIImageResizingMode</span> mode = <span class="built_in">UIImageResizingModeStretch</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 拉伸图片</span></span><br><span class="line"><span class="built_in">UIImage</span> *newImage = [image resizableImageWithCapInsets:edgeInsets resizingMode:mode];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置按钮的背景图片</span></span><br><span class="line">[btn setBackgroundImage:newImage forState:<span class="built_in">UIControlStateNormal</span>];</span><br></pre></td></tr></table></figure>
+
+<p>运行效果:</p>
+<p><img src="https://raw.githubusercontent.com/YotrolZ/hexo/master/img/590107-c8bb482c7cd59d7e.png" alt="运行效果图4.png"></p>
+<p>方式4:(最简单的一种方式)<br><img src="https://raw.githubusercontent.com/YotrolZ/hexo/master/img/590107-f7248ae46f5d9401.png" alt="设置slicing属性.png"><br><img src="https://raw.githubusercontent.com/YotrolZ/hexo/master/img/590107-4aed700454ebb5bf.png" alt="设置后.png"></p>
+<p>是不是So easy~~</p>
+<p>运行效果:</p>
+<p><img src="https://raw.githubusercontent.com/YotrolZ/hexo/master/img/590107-e3f5d596d4fc8101.png" alt="运行效果5.png"></p>
+<p>备注：上面所有通过代码来拉伸图片的方法都是<code>返回</code>一个拉伸后的<code>新图片</code>.</p>
+
+      </div>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>Author: </span>
+      <a href="http://yotrolz.com">YotrolZ</a>
+    </p>
+    <p class="copyright-item">
+      <span>Link: </span>
+      <a href="http://yotrolz.com/posts/5fe4e0ec/">http://yotrolz.com/posts/5fe4e0ec/</a>
+    </p>
+    <p class="copyright-item">
+      <span>License: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/posts/c8aae65b/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">iOS多线程的4种实现方案</span>
+        <span class="prev-text nav-mobile">Prev</span>
+      </a>
+    <a class="next" href="/posts/1e6befc2/">
+        <span class="next-text nav-default">自定义View的创建、添加、移除执行过程分析</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="social-links"></div><div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2015 - 2020<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">YotrolZ</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</body>
+</html>

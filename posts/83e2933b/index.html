@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="iOS应用程序间的跳转"/><link rel="alternate" href="/atom.xml" title="YotrolZ" type="application/atom+xml"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
+<link rel="canonical" href="http://yotrolz.com/posts/83e2933b/"/>
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-138610487-3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-138610487-3');
+</script><script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":"","latex":false};
+</script>
+
+    <title>iOS应用程序间的跳转 - YotrolZ</title>
+  <meta name="generator" content="Hexo 5.2.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">YotrolZ</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">Home
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">YotrolZ</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            Home
+            </a>
+        </li>
+      </ul></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">iOS应用程序间的跳转
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2015-08-13
+        </span><span class="post-category">
+            <a href="/categories/iOS/">iOS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80-%E4%BB%8E%E5%BA%94%E7%94%A8A%E7%9B%B4%E6%8E%A5%E8%B7%B3%E8%BD%AC%E5%88%B0%E5%BA%94%E7%94%A8B"><span class="toc-text">一.从应用A直接跳转到应用B</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%AE%BE%E7%BD%AE%E5%BA%94%E7%94%A8B%E7%9A%84URL-Types%E4%B8%AD%E7%9A%84URL-Schemes"><span class="toc-text">1.设置应用B的URL Types中的URL Schemes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%9C%A8%E5%BA%94%E7%94%A8A%E4%B8%AD%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%B8%AA%E8%B7%B3%E8%BD%AC%E7%9A%84%E6%8C%89%E9%92%AE-%E5%B9%B6%E7%9B%91%E5%90%AC%E7%82%B9%E5%87%BB"><span class="toc-text">2.在应用A中添加一个跳转的按钮,并监听点击</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C-%E4%BB%8E-%E5%BA%94%E7%94%A8A-%E8%B7%B3%E8%BD%AC%E5%88%B0-%E5%BA%94%E7%94%A8B-%E7%9A%84%E5%88%B6%E5%AE%9A%E7%9A%84%E9%A1%B5%E9%9D%A2"><span class="toc-text">二.从 应用A 跳转到 应用B 的制定的页面</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%AE%BE%E7%BD%AE%E5%BA%94%E7%94%A8B%E7%9A%84URL-Types%E4%B8%AD%E7%9A%84URL-Schemes-%E8%BF%99%E9%87%8C%E4%B8%8D%E5%86%8D%E8%B5%98%E8%BF%B0"><span class="toc-text">1.设置应用B的URL Types中的URL Schemes,(这里不再赘述)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%9C%A8%E5%BA%94%E7%94%A8A%E4%B8%AD%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%B8%AA%E8%B7%B3%E8%BD%AC%E7%9A%84%E6%8C%89%E9%92%AE-%E5%B9%B6%E7%9B%91%E5%90%AC%E7%82%B9%E5%87%BB-1"><span class="toc-text">2.在应用A中添加一个跳转的按钮,并监听点击</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%9C%A8%E5%BA%94%E7%94%A8B%E4%B8%AD%E7%9B%91%E5%90%AC%E8%B7%B3%E8%BD%AC-%E8%BF%9B%E8%A1%8C%E5%88%A4%E6%96%AD-%E6%89%A7%E8%A1%8C%E4%B8%8D%E5%90%8C%E7%9A%84%E8%B7%B3%E8%BD%AC"><span class="toc-text">3.在应用B中监听跳转,进行判断,执行不同的跳转</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89-%E4%BB%8E-%E5%BA%94%E7%94%A8B-%E5%8F%8D%E8%B7%B3%E8%BD%AC%E5%88%B0-%E5%BA%94%E7%94%A8A"><span class="toc-text">三.从 应用B 反跳转到 应用A</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><h1 id="一-从应用A直接跳转到应用B"><a href="#一-从应用A直接跳转到应用B" class="headerlink" title="一.从应用A直接跳转到应用B"></a>一.从<code>应用A</code>直接跳转到<code>应用B</code></h1><ul>
+<li>以应用A(网易)与应用B(微信)说明,<code>网易</code>应用跳转至<code>微信</code>应用;</li>
+</ul>
+<a id="more"></a>
+<h2 id="1-设置应用B的URL-Types中的URL-Schemes"><a href="#1-设置应用B的URL-Types中的URL-Schemes" class="headerlink" title="1.设置应用B的URL Types中的URL Schemes"></a>1.设置应用B的<code>URL Types</code>中的<code>URL Schemes</code></h2><p><img src="http://upload-images.jianshu.io/upload_images/590107-9a1e80511b9ca7b0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="设置URL Schemes"></p>
+<h2 id="2-在应用A中添加一个跳转的按钮-并监听点击"><a href="#2-在应用A中添加一个跳转的按钮-并监听点击" class="headerlink" title="2.在应用A中添加一个跳转的按钮,并监听点击"></a>2.在应用A中添加一个跳转的按钮,并监听点击</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- (IBAction)skipToWechat:(id)sender &#123; </span><br><span class="line"></span><br><span class="line">    NSURL *url &#x3D; [NSURL URLWithString:@&quot;wechat:&#x2F;&#x2F;&quot;];</span><br><span class="line">    &#x2F;&#x2F; 如果已经安装了这个应用,就跳转</span><br><span class="line">    if ([[UIApplication sharedApplication] canOpenURL:url]) &#123;</span><br><span class="line">        [[UIApplication sharedApplication] openURL:url];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>注意点:<ul>
+<li>一个<code>URL</code>是可以没有路径的,但是<code>协议头</code>必须的完整;</li>
+<li>只要协议头和对应的应用的<code>URL Schemes</code>一致,就可知跳转到对应的应用,与URL路径无关</li>
+</ul>
+</li>
+</ul>
+<h1 id="二-从-应用A-跳转到-应用B-的制定的页面"><a href="#二-从-应用A-跳转到-应用B-的制定的页面" class="headerlink" title="二.从 应用A 跳转到 应用B 的制定的页面"></a>二.从 <em>应用A</em> 跳转到 <em>应用B</em> 的制定的页面</h1><h2 id="1-设置应用B的URL-Types中的URL-Schemes-这里不再赘述"><a href="#1-设置应用B的URL-Types中的URL-Schemes-这里不再赘述" class="headerlink" title="1.设置应用B的URL Types中的URL Schemes,(这里不再赘述)"></a>1.设置应用B的<code>URL Types</code>中的<code>URL Schemes</code>,(这里不再赘述)</h2><h2 id="2-在应用A中添加一个跳转的按钮-并监听点击-1"><a href="#2-在应用A中添加一个跳转的按钮-并监听点击-1" class="headerlink" title="2.在应用A中添加一个跳转的按钮,并监听点击"></a>2.在应用A中添加一个跳转的按钮,并监听点击</h2><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 跳转到微信的朋友圈页面</span></span><br><span class="line">- (<span class="keyword">IBAction</span>)skipToSession:(<span class="keyword">id</span>)sender &#123;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">NSURL</span> *url = [<span class="built_in">NSURL</span> URLWithString:<span class="string">@&quot;wechat://session&quot;</span>];</span><br><span class="line">    <span class="comment">// 如果已经安装了这个应用,就跳转</span></span><br><span class="line">    <span class="keyword">if</span> ([[<span class="built_in">UIApplication</span> sharedApplication] canOpenURL:url]) &#123;</span><br><span class="line">        [[<span class="built_in">UIApplication</span> sharedApplication] openURL:url];</span><br><span class="line">    &#125;   </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 跳转到微信的好友列表页面</span></span><br><span class="line">- (<span class="keyword">IBAction</span>)skipToSession:(<span class="keyword">id</span>)sender &#123;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">NSURL</span> *url = [<span class="built_in">NSURL</span> URLWithString:<span class="string">@&quot;wechat://timeLine&quot;</span>];</span><br><span class="line">    <span class="comment">// 如果已经安装了这个应用,就跳转</span></span><br><span class="line">    <span class="keyword">if</span> ([[<span class="built_in">UIApplication</span> sharedApplication] canOpenURL:url]) &#123;</span><br><span class="line">        [[<span class="built_in">UIApplication</span> sharedApplication] openURL:url];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>备注:<code>session</code>和<code>timeLine </code>是我们自定义的,到时候根据这两个不同的路径分别进行不同的跳转(见下文)</li>
+</ul>
+<h2 id="3-在应用B中监听跳转-进行判断-执行不同的跳转"><a href="#3-在应用B中监听跳转-进行判断-执行不同的跳转" class="headerlink" title="3.在应用B中监听跳转,进行判断,执行不同的跳转"></a>3.在应用B中监听跳转,进行判断,执行不同的跳转</h2><ul>
+<li>在<code>AppDelegate</code>中实现下面的方法监听;</li>
+</ul>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这个方法快失效了</span></span><br><span class="line"><span class="comment">//- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url &#123;</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//    return YES;</span></span><br><span class="line"><span class="comment">//&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果通过URL打开的这个应用就会调用这个方法,我们在这个方法里面进行判断并跳转到不同的页面</span></span><br><span class="line"><span class="comment">// url就是执行跳转时的url</span></span><br><span class="line">- (<span class="built_in">BOOL</span>)application:(<span class="built_in">UIApplication</span> *)application openURL:(<span class="built_in">NSURL</span> *)url sourceApplication:(<span class="built_in">NSString</span> *)sourceApplication annotation:(<span class="keyword">id</span>)annotation &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将URL转成字符串</span></span><br><span class="line">    <span class="built_in">NSString</span> *urlString = url.absoluteString;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 获取跟控制器</span></span><br><span class="line">    <span class="built_in">UINavigationController</span> *nav = (<span class="built_in">UINavigationController</span> *)application.keyWindow.rootViewController;</span><br><span class="line">    ViewController *vc = [nav.childViewControllers firstObject];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 每次跳转前必须是在跟控制器(细节)</span></span><br><span class="line">    [nav popToRootViewControllerAnimated:<span class="literal">NO</span>];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> ([urlString containsString:<span class="string">@&quot;timeLine&quot;</span>]) &#123; <span class="comment">// 跳转到朋友圈</span></span><br><span class="line">        <span class="comment">// 根据segue标示进行跳转</span></span><br><span class="line">        [vc performSegueWithIdentifier:<span class="string">@&quot;jump2tiemLine&quot;</span> sender:<span class="literal">nil</span>];</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> ([urlString containsString:<span class="string">@&quot;session&quot;</span>]) &#123; <span class="comment">// 跳转到好友列表</span></span><br><span class="line">        <span class="comment">// 根据segue标示进行跳转</span></span><br><span class="line">        [vc performSegueWithIdentifier:<span class="string">@&quot;jump2session&quot;</span> sender:<span class="literal">nil</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>注意点:我们通过<code>URL打开</code>的应用就会调用这个方法,不管这个应用是在后台还是杀死状态;</li>
+</ul>
+<h1 id="三-从-应用B-反跳转到-应用A"><a href="#三-从-应用B-反跳转到-应用A" class="headerlink" title="三.从 应用B 反跳转到 应用A"></a>三.从 <em>应用B</em> 反跳转到 <em>应用A</em></h1><ul>
+<li>细节分析:<ul>
+<li>1.我们进行反跳的时候,要根据是谁跳转来的,然后跳转到相应的应用;也就是说,我们在进行跳转时要还要携带自身的一些数据,根据这个数据反跳到对应的应用;</li>
+<li>2.制作一个规定:我们跳转的时候将自己的<code>URL Schemes</code>携带过来,如下:<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">@&quot;wechat://timeLine?news&quot;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>说明:<br>   <code>wechat://</code>:将要跳转到的应用的<code>URL Schemes</code>;<br>   <code>timeLine</code>:用于区分跳转到应用的哪个页面;<br>   <code>?</code>:分隔符<br>   <code>news</code>:自身的<code>URL Schemes</code>,配置方法与上面的一样</li>
+</ul>
+</li>
+<li>3.获取数据应用跳转前的数据,并反跳回去<ul>
+<li>1.在应用B的<code>- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation;</code>方法中,我们能够获取完整的URL(也就是<code>wechat://timeLine?news</code>),所以在跳转前的控制器中添加一个属性,用于保存;</li>
+<li>2.重写这个控制器的<code>- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender;</code>方法,这样我们能够根据<code>segue.destinationViewController</code>获取要跳转到的控制器;</li>
+<li>3.在要跳转到的控制器中定义一个属性,用于接受,并截取,拼接成合法的URL(此时的URL已经是跳转前的那个应用的<code>URL Schemes</code>),执行跳转即可返回对应的应用</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+      </div>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>Author: </span>
+      <a href="http://yotrolz.com">YotrolZ</a>
+    </p>
+    <p class="copyright-item">
+      <span>Link: </span>
+      <a href="http://yotrolz.com/posts/83e2933b/">http://yotrolz.com/posts/83e2933b/</a>
+    </p>
+    <p class="copyright-item">
+      <span>License: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/posts/552ed0af/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">UITextField-修改占位文字和光标的颜色,大小</span>
+        <span class="prev-text nav-mobile">Prev</span>
+      </a>
+    <a class="next" href="/posts/c6b5a9b8/">
+        <span class="next-text nav-default">本地Git仓库和远程仓库的创建及关联</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="social-links"></div><div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2015 - 2020<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">YotrolZ</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</body>
+</html>
