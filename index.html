@@ -106,6 +106,28 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/posts/d115d42e/">iOS Block底层原理</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-08-29
+        </span></div>
+    </header>
+
+    <div class="post-content"><h2 id="Block的底层结构"><a href="#Block的底层结构" class="headerlink" title="Block的底层结构"></a>Block的底层结构</h2><ul>
+<li>最普通的Block</li>
+<li>带<code>参数</code>的Block</li>
+<li>访问了外部<code>auto变量</code>的Block</li>
+<li>访问了外部<code>static变量</code>的Block</li>
+<li>访问了<code>全局变量</code>的Block</li>
+</ul>
+          <div class="read-more">
+            <a href="/posts/d115d42e/" class="read-more-link">Read more..</a>
+          </div>
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/posts/7f2a4d1e/">iOS 自动释放池(autoreleasepool)</a>
         </h1>
 
@@ -121,7 +143,6 @@
     <div class="post-content"><h2 id="AutoreleasePool简介"><a href="#AutoreleasePool简介" class="headerlink" title="AutoreleasePool简介"></a>AutoreleasePool简介</h2><ul>
 <li><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/foundation/nsautoreleasepool">Apple官方说明</a>：一个用来支持引用计数内存管理系统的对象；</li>
 </ul>
-<p><img src="https://upload-images.jianshu.io/upload_images/590107-1991d31d02d6fea7.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="NSAutoreleasePool"></p>
           <div class="read-more">
             <a href="/posts/7f2a4d1e/" class="read-more-link">Read more..</a>
           </div>
@@ -168,7 +189,7 @@
         </div></article>
       <article class="post">
     <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/posts/undefined/">isKindOf,isMemberOf,isSubclassOf用法及区别</a>
+      <h1 class="post-title"><a class="post-link" href="/posts/c46b1cd/">isKindOf,isMemberOf,isSubclassOf用法及区别</a>
         </h1>
 
       <div class="post-meta">
@@ -184,26 +205,9 @@
 <p>Returns a Boolean value that indicates whether the receiver is an instance of given class or an instance of any class that inherits from that class.</p>
 </blockquote>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 调用该方法的对象是aClass或其子类的一个对象，则返回YES；否则返回NO；</span></span><br><span class="line">- (<span class="built_in">BOOL</span>)isKindOfClass:(Class)aClass;</span><br></pre></td></tr></table></figure>
-
-
-<ul>
-<li>isMemberOfClass</li>
-</ul>
-<blockquote>
-<p>Returns a Boolean value that indicates whether the receiver is an instance of a given class.</p>
-</blockquote>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 调用该方法的对象是参数类的一个对象，就返回YES，否则返回NO</span></span><br><span class="line">- (<span class="built_in">BOOL</span>)isMemberOfClass:(Class)aClass;</span><br></pre></td></tr></table></figure>
-
-
-<ul>
-<li>isSubclassOfClass</li>
-</ul>
-<blockquote>
-<p>Returns a Boolean value that indicates whether the receiving class is a subclass of, or identical to, a given class.</p>
-</blockquote>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 调用该方法的类是aClass的子类或与aClass相同，则为YES，否则为NO。</span></span><br><span class="line">+ (<span class="built_in">BOOL</span>)isSubclassOfClass:(Class)aClass;</span><br></pre></td></tr></table></figure>
-
-
+          <div class="read-more">
+            <a href="/posts/c46b1cd/" class="read-more-link">Read more..</a>
+          </div>
         </div></article>
       <article class="post">
     <header class="post-header">
@@ -219,7 +223,7 @@
         </div>
     </header>
 
-    <div class="post-content"><h1 id="程序启动的过程总结"><a href="#程序启动的过程总结" class="headerlink" title="程序启动的过程总结"></a>程序启动的过程总结</h1><h3 id="1-main函数"><a href="#1-main函数" class="headerlink" title="1.main函数"></a>1.main函数</h3><h3 id="2-UIApplicationMain"><a href="#2-UIApplicationMain" class="headerlink" title="2.UIApplicationMain"></a>2.UIApplicationMain</h3><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> <span class="built_in">UIApplicationMain</span>(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[], <span class="built_in">NSString</span> *principalClassName, <span class="built_in">NSString</span> *delegateClassName);</span><br></pre></td></tr></table></figure>
+    <div class="post-content"><h3 id="1-main函数"><a href="#1-main函数" class="headerlink" title="1.main函数"></a>1.main函数</h3><h3 id="2-UIApplicationMain"><a href="#2-UIApplicationMain" class="headerlink" title="2.UIApplicationMain"></a>2.UIApplicationMain</h3><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> <span class="built_in">UIApplicationMain</span>(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[], <span class="built_in">NSString</span> *principalClassName, <span class="built_in">NSString</span> *delegateClassName);</span><br></pre></td></tr></table></figure>
 <ul>
 <li>此函数会根据<code>principalClassName</code>创建<code>UIApplication</code>对象</li>
 <li>此函数会根据<code>delegateClassName</code>创建一个<code>delegate</code>对象</li>
@@ -319,25 +323,6 @@
     <div class="post-content"><h4 id="方式一-设置layer相关的属性"><a href="#方式一-设置layer相关的属性" class="headerlink" title="方式一:设置layer相关的属性"></a>方式一:设置<em>layer</em>相关的属性</h4>
           <div class="read-more">
             <a href="/posts/428e23d5/" class="read-more-link">Read more..</a>
-          </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/posts/552ed0af/">UITextField-修改占位文字和光标的颜色,大小</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2015-08-16
-        </span><span class="post-category">
-            <a href="/categories/iOS/">iOS</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><h1 id="一-设置占位文字的颜色"><a href="#一-设置占位文字的颜色" class="headerlink" title="一.设置占位文字的颜色"></a>一.设置占位文字的颜色</h1>
-          <div class="read-more">
-            <a href="/posts/552ed0af/" class="read-more-link">Read more..</a>
           </div>
         </div></article>
       <nav class="pagination"><a class="next" href="/page/2/">

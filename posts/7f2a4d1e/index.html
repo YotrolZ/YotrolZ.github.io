@@ -126,24 +126,19 @@
   </div><div class="post-content"><h2 id="AutoreleasePool简介"><a href="#AutoreleasePool简介" class="headerlink" title="AutoreleasePool简介"></a>AutoreleasePool简介</h2><ul>
 <li><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/foundation/nsautoreleasepool">Apple官方说明</a>：一个用来支持引用计数内存管理系统的对象；</li>
 </ul>
-<p><img src="https://upload-images.jianshu.io/upload_images/590107-1991d31d02d6fea7.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="NSAutoreleasePool"></p>
 <a id="more"></a>
-
+<p><img src="https://upload-images.jianshu.io/upload_images/590107-1991d31d02d6fea7.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="NSAutoreleasePool"></p>
 <blockquote>
 <p>从Apple官方文档中我们可以得出以下比较重要的几点</p>
 </blockquote>
 <ul>
-<li><p>如果你使用ARC，你不能直接<code>NSAutoreleasePool</code>，你可以使用<code>@autoreleasepool</code> block.</p>
-</li>
-<li><p><code>NSAutoreleasePool</code>对象不能调用<code>retain</code>和<code>autorelease</code>；</p>
-  <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">autorelease</span><br><span class="line">    Raises an exception. <span class="comment">// 抛出异常</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">retain</span></span><br><span class="line">    Raises an exception. <span class="comment">// 抛出异常</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>在引用计数环境中，一个<code>NSAutoreleasePool</code>对象内部包含了很多接受到<code>autorelease</code>消息的对象，当<code>NSAutoreleasePool</code>对象释放后，它将向其包含的每个对象发送<code>release</code>消息，因此给对象发送<code>autorelease</code>消息比<code>release</code>消息，延长了该对象的寿命(发送<code>release</code>可能直接销毁，而调用<code>autorelease</code>消息，会将其添加到<code>NSAutoreleasePool</code>中，随着<code>NSAutoreleasePool</code>的销毁才可能销毁)；</p>
-</li>
-<li><p>一个对象可以多次放到同一个自动释放池中，这种情况下，该对象将会收到多次的<code>release</code>消息；</p>
-</li>
-<li><p><code>Application Kit</code> 在事件循环开始的时候在主线程创建了一个自动释放池，并且在结束的时候去清空它，从而释放所有进程事件中生成的自动释放的对象。如果使用了 <code>Application Kit</code> ，就没必要再去创建自己的自动释放池。</p>
-</li>
+<li>如果你使用ARC，你不能直接<code>NSAutoreleasePool</code>，你可以使用<code>@autoreleasepool</code> block.</li>
+<li><code>NSAutoreleasePool</code>对象不能调用<code>retain</code>和<code>autorelease</code>；  <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">autorelease</span><br><span class="line">    Raises an exception. <span class="comment">// 抛出异常</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">retain</span></span><br><span class="line">    Raises an exception. <span class="comment">// 抛出异常</span></span><br></pre></td></tr></table></figure></li>
+<li>在引用计数环境中，一个<code>NSAutoreleasePool</code>对象内部包含了很多接受到<code>autorelease</code>消息的对象，当<code>NSAutoreleasePool</code>对象释放后，它将向其包含的每个对象发送<code>release</code>消息，因此给对象发送<code>autorelease</code>消息比<code>release</code>消息，延长了该对象的寿命(发送<code>release</code>可能直接销毁，而调用<code>autorelease</code>消息，会将其添加到<code>NSAutoreleasePool</code>中，随着<code>NSAutoreleasePool</code>的销毁才可能销毁)；</li>
+<li>一个对象可以多次放到同一个自动释放池中，这种情况下，该对象将会收到多次的<code>release</code>消息；</li>
+<li><code>Application Kit</code> 在事件循环开始的时候在主线程创建了一个自动释放池，并且在结束的时候去清空它，从而释放所有进程事件中生成的自动释放的对象。如果使用了 <code>Application Kit</code> ，就没必要再去创建自己的自动释放池。</li>
+</ul>
+<ul>
 <li><p>如果你的应用在事件循环中创建了很多临时的<code>autorelease</code>的对象，你可以创建一个自动释放池以最大程度地减少峰值内存占用。</p>
 <ul>
 <li><p>其实这句话的意思大概是这样的：主线程中默认创建了一个自动释放池，由于调用了<code>autorelease</code>的对象会延迟释放(等到自动释放池销毁)，如果你在应用的事件循环中创建了很多临时的<code>autorelease</code>对象，你可以自己创建一个自动释放池以最大程度地减少峰值内存占用。</p>
@@ -264,7 +259,12 @@
   </div>
       <footer class="post-footer">
         
-        <nav class="post-nav"><a class="next" href="/posts/638a6f77/">
+        <nav class="post-nav"><a class="prev" href="/posts/d115d42e/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">iOS Block底层原理</span>
+        <span class="prev-text nav-mobile">Prev</span>
+      </a>
+    <a class="next" href="/posts/638a6f77/">
         <span class="next-text nav-default">iOS 分类(Categoty)</span>
         <span class="prev-text nav-mobile">Next</span>
         <i class="iconfont icon-right"></i>
