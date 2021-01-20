@@ -2,6 +2,7 @@
 title: iOS 引用计数中惊艳的原子操作
 date: 2021-01-19 19:13:56
 tags:
+description: 所谓原子操作(atomic)，就是不可分割的操作，在其操作所属期间，不会因为`线程调度`而被打断。本文旨在讲解在引用计数中涉及到的原子操作，别有一番风味，请慢慢享用~~ 
 ---
 
 # 简述
@@ -19,7 +20,7 @@ tags:
 
 # iOS 引用计数关键源码
 
-在`objc_object`中关于内存应用计数相关的方法，通过一个`宏判断`实现了两套逻辑，代码如下:
+在`objc_object`源码中，关于内存应用计数相关的方法，通过一个`宏判断`实现了两套逻辑，代码如下:
 
 ```c++
 #if SUPPORT_NONPOINTER_ISA
@@ -38,7 +39,6 @@ tags:
 - 调用`retain`，其实会来到这里，不做过多解释；
 
 ```c++
-
 ALWAYS_INLINE id 
 objc_object::rootRetain(bool tryRetain, bool handleOverflow)
 {
@@ -106,9 +106,9 @@ objc_object::rootRetain(bool tryRetain, bool handleOverflow)
 ## 源码中发现的问题
 
 - 为什么要加一个 do while 循环？
-- `newisa.bits = addc(newisa.bits, RC_ONE, 0, &carry);`为什么不需要加锁等相关操作，以保证线程同步？
+- `newisa.bits = addc(newisa.bits, RC_ONE, 0, &carry);`为什么不需要`加锁`等相关操作，那么该操作如何保证`线程同步`的呢？
 
-- 一个猜想：莫非这个`addc`加一操作是通过 `do while` 来实现`原子操作`的？
+- *一个猜想*： 莫非这个`addc`加一操作是通过 `do while` 来实现`原子操作`的？
 
 
 > 重点来了~
@@ -147,7 +147,7 @@ bool StoreExclusive(uintptr_t *dst, uintptr_t oldvalue __unused, uintptr_t value
 
 #### 汇编指令  `stxr` 
 
-- 这里是`ARM`中的一个`原子操作指令`，是不是发现了新大陆。
+- 这是`ARM`中的一个`原子操作指令`，是不是发现了新大陆。
 
 
 ### `StoreExclusive (__x86_64__  ||  __i386__)`
