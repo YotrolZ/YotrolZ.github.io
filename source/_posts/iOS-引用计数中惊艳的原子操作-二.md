@@ -7,9 +7,9 @@ tags:
 ---
 
 
-### 模拟多线程数据竞争
+## 模拟多线程数据竞争
 
-#### 测试说明
+### 测试说明
 - 引用计数变量`rc`初始值为`0`
 - 开启`多条线程`，分别对引用计数`rc`进行`100000`次的循环`+1`操作，执行`6次`
   - `100000次循环`只是为了适当的增加操作消耗，便于突出数据竞争(是否为原子操作)
@@ -19,7 +19,7 @@ tags:
 - 期望结果: `rc = 600000`, 即：这个`100000次循环+1`操作不可分割(原子性)，避免了多线程对`rc`的数据竞争
 
 
-#### 测试工程
+### 测试工程
 
 ```objc
 
@@ -52,8 +52,8 @@ tags:
 ```
 
 
-### 案例1： 直接进行操作
-#### 代码
+## 案例1： 直接进行操作
+### 代码
 ```objc
 - (void)rc_add_1 {
     for(int i = 0; i < 100000; i++) {
@@ -63,7 +63,7 @@ tags:
 }
 ```
 
-#### 运行结果
+### 运行结果
 ```objc
 <NSThread: 0x283ca03c0>{number = 3, name = (null)} --- 当前引用计数：68046
 <NSThread: 0x283cb4a00>{number = 6, name = (null)} --- 当前引用计数：156790
@@ -73,15 +73,16 @@ tags:
 <NSThread: 0x283ca9100>{number = 5, name = (null)} --- 当前引用计数：288438
 ```
 
-#### 结果分析
+### 结果分析
 
 - `rc != 600000`
 - 出现了线程间的数据竞争
 
 
 
-### 案例2： 使用 ldxr stxr 实现原子操作
-#### 代码
+## 案例2： 使用 ldxr stxr 实现原子操作
+- 需要在 `arm64` 设备上运行，原因可以看下面的代码
+### 代码
 ```objc
 - (void)rc_add_2 {
     
@@ -127,7 +128,7 @@ static bool StoreExclusive(uintptr_t *dst, uintptr_t oldvalue __unused, uintptr_
 ```
 
 
-#### 运行结果
+### 运行结果
 ```objc
 <NSThread: 0x281dd8440>{number = 3, name = (null)} --- 引用计数：0 --- !result: 0
 <NSThread: 0x281dd8440>{number = 3, name = (null)} --- 引用计数：0 --- !result: 0
@@ -175,7 +176,7 @@ static bool StoreExclusive(uintptr_t *dst, uintptr_t oldvalue __unused, uintptr_
 <NSThread: 0x281dd8c00>{number = 6, name = (null)} --- 引用计数：6000000 --- !result: 1
 ```
 
-#### 结果分析
+### 结果分析
 
 - `rc == 600000`
   - 确实解决了线程间数据竞争的问题，原子操作
@@ -198,8 +199,8 @@ static bool StoreExclusive(uintptr_t *dst, uintptr_t oldvalue __unused, uintptr_
 
 
 
-### 案例3： CAS-Compare And Swap
-#### 代码
+## 案例3： CAS-Compare And Swap
+### 代码
 ```objc
 - (void)rc_add_3 {
     
@@ -227,7 +228,7 @@ bool StoreExclusive(uintptr_t *dst, uintptr_t oldvalue, uintptr_t value) {
 }
 ```
 
-#### 运行结果
+### 运行结果
 ```objc
 <NSThread: 0x2829ce200>{number = 6, name = (null)} --- 引用计数：1000000 --- result: 1
 <NSThread: 0x2829cce40>{number = 3, name = (null)} --- 引用计数：1000000 --- result: 0
@@ -246,7 +247,7 @@ bool StoreExclusive(uintptr_t *dst, uintptr_t oldvalue, uintptr_t value) {
 <NSThread: 0x282984f00>{number = 9, name = (null)} --- 引用计数：6000000 --- result: 1
 ```
 
-#### 结果分析
+### 结果分析
 
 - `rc == 600000`
   - 确实解决了线程间数据竞争的问题，原子操作
@@ -272,8 +273,8 @@ bool StoreExclusive(uintptr_t *dst, uintptr_t oldvalue, uintptr_t value) {
 
 
 
-### 案例4： __sync_fetch_and_add
-#### 代码
+## 案例4： __sync_fetch_and_add
+### 代码
 ```objc
 - (void)rc_add_4 {
     for(int i = 0; i < 100000; i++) {
@@ -284,7 +285,7 @@ bool StoreExclusive(uintptr_t *dst, uintptr_t oldvalue, uintptr_t value) {
 }
 ```
 
-#### 运行结果
+### 运行结果
 ```objc
 <NSThread: 0x2837cc8c0>{number = 6, name = (null)} --- 当前引用计数：213804
 <NSThread: 0x28379efc0>{number = 3, name = (null)} --- 当前引用计数：430096
@@ -294,12 +295,12 @@ bool StoreExclusive(uintptr_t *dst, uintptr_t oldvalue, uintptr_t value) {
 <NSThread: 0x2837cc8c0>{number = 6, name = (null)} --- 当前引用计数：600000
 ```
 
-#### 结果分析
+### 结果分析
 
 - `rc != 600000`
 - 确实解决了线程间数据竞争的问题，原子操作
 
-#### 补充
+### 补充
 
 [5.44 Built-in functions for atomic memory access
 ](https://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Atomic-Builtins.html)
