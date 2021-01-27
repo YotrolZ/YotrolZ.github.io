@@ -1,5 +1,5 @@
 ---
-title: iOS 引用计数中惊艳的原子操作
+title: iOS 引用计数中惊艳的原子操作(一)
 description: >-
   所谓原子操作(atomic)，就是不可分割的操作，在其操作所属期间，不会因为`线程调度`而被打断。本文旨在讲解在引用计数中涉及到的原子操作，别有一番风味，请慢慢享用~~
 abbrlink: 5013a5ee
@@ -224,7 +224,7 @@ StoreExclusive(uintptr_t *dst, uintptr_t oldvalue __unused, uintptr_t value)
 
 #### ldxr 指令
 - Load exclusive register 
-- [ldxr - ARM 官方文档](https://developer.arm.com/documentation/dui0802/a/A64-Data-Transfer-Instructions/LDXR)
+- [ldxr - ARM 官方文档](https://developer.arm.com/documentation/dui0801/i/A64-Data-Transfer-Instructions/LDXR?lang=en)
 ```c++
 LDXR  Wt, [Xn|SP{,#0}]    ; 32-bit general registers
 LDXR  Xt, [Xn|SP{,#0}]    ; 64-bit general registers
@@ -237,7 +237,7 @@ LDXR  Xt, [Xn|SP{,#0}]    ; 64-bit general registers
 
 #### stxr 指令
 - Store exclusive register, returning status.
-- [stxr - ARM 官方文档](https://developer.arm.com/documentation/dui0802/a/A64-Data-Transfer-Instructions/STXR)
+- [stxr - ARM 官方文档](https://developer.arm.com/documentation/dui0801/i/A64-Data-Transfer-Instructions/STXR?lang=en)
 ```c++
 STXR  Ws, Wt, [Xn|SP{,#0}]    ; 32-bit general registers
 STXR  Ws, Xt, [Xn|SP{,#0}]    ; 64-bit general registers
