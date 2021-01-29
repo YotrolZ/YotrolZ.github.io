@@ -326,3 +326,7 @@ type __sync_nand_and_fetch (type *ptr, type value, ...)
 - `__sync_add_and_fetch`: 先`add` 再 `fetch`
 
 
+## 后续
+
+- 上述我们主要是针对`objc源码`中 `引用计数` 部分`原子操作`的实现及其延伸进行了演示；
+- 当然了，我们依然可以采用常见的`锁`及`信号量`来实现；
