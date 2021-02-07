@@ -159,7 +159,9 @@ objc_object::rootRetain(bool tryRetain, bool handleOverflow)
 
 # LoadExclusive 和 StoreExclusive
 
-在源码中`StoreExclusive`对于不用的`处理器架构`有三种不同的实现：
+- `Exclusive`: 独有的；排外的；专一的;
+
+在源码中`StoreExclusive`对于不同的`处理器架构`有三种不同的实现：
 - `__arm64__`
 - `__arm__`
 - `__x86_64__  ||  __i386__`
@@ -224,7 +226,7 @@ LDXR  Xt, [Xn|SP{,#0}]    ; 64-bit general registers
 - `Xt`：64位的通用寄存器名称，范围：`0 ~ 31`
 - `Xn|SP`：64位的通用基址寄存器或堆栈指针，范围：`0 ~ 31`
 
-- *说明：`32位/64`为代表寄存器的`容量`，`范围`可以理解为寄存器的`编号`*
+- *说明：`32位/64位` 代表寄存器的 `容量`，`范围` 可以理解为寄存器的 `编号`*
 
 #### stxr 指令
 - Store exclusive register, returning status.
@@ -238,14 +240,24 @@ STXR  Ws, Xt, [Xn|SP{,#0}]    ; 64-bit general registers
 - `Ws`：32位的通用寄存器名称，存储 `exclusive` 的状态
 - `Xn|SP`：64位的通用基址寄存器或堆栈指针，范围：`0 ~ 31`
 
-- *说明：`32位/64`为代表寄存器的`容量`，`范围`可以理解为寄存器的`编号`*
+- *说明：`32位/64位` 代表寄存器的 `容量`，`范围` 可以理解为寄存器的 `编号`*
+
+
+> 关于`Exclusive accesses`更多内容可以参考ARM开发者文档中对[Exclusive accesses](https://developer.arm.com/documentation/dht0008/a/arm-synchronization-primitives/exclusive-accesses?lang=en) 的介绍
+
 
 
 ## __x86_64__  ||  __i386__
 
 ```c++
-static ALWAYS_INLINE
-bool StoreExclusive(uintptr_t *dst, uintptr_t oldvalue, uintptr_t value)
+static ALWAYS_INLINE uintptr_t 
+LoadExclusive(uintptr_t *src)
+{
+    return *src;
+}
+
+static ALWAYS_INLINE bool 
+StoreExclusive(uintptr_t *dst, uintptr_t oldvalue, uintptr_t value)
 {
     return __sync_bool_compare_and_swap((void **)dst, (void *)oldvalue, (void *)value);
 }
@@ -259,23 +271,28 @@ bool StoreExclusive(uintptr_t *dst, uintptr_t oldvalue, uintptr_t value)
     - 比如：此刻期望将数据修改为10，但是由于多线程的缘故，此刻内存中的真实值并不一定为10，如果不为10，就不执行写入操作；
 
 
-## `do while` 循环的作用
+# `do while` 循环的作用
 ```c++
 // 简化代码
 objc_object::rootRetain()
 {
-    isa_t oldRC; // 用于存储此刻内存中的真实值
-    isa_t newRC; // 用于存储此刻操作期的期望值
+    isa_t oldisa; // 用于存储此刻内存中的真实值
+    isa_t newisa; // 用于存储此刻操作期的期望值
     
-    oldRC = &isa.RC // 从内存中读取此刻真实值(这里不够严谨，为便于理解)
+    oldisa = LoadExclusive(&isa.bits); // 从内存中读取此刻真实值
+    newisa = oldisa;
 
     do {
-        newRC++; // 引用计数加一操作
-    } while (!StoreExclusive(&isa.RC, oldRC, newRC));
+        // extra_rc++ 溢出标记
+        uintptr_t carry;
+        // extra_rc++
+        newisa.bits = addc(newisa.bits, RC_ONE, 0, &carry);
+    } while (slowpath(!StoreExclusive(&isa.bits, oldisa.bits, newisa.bits)));
 }
 ```
 
 这样就很直观了~
 - 注意`while` 条件中的 取反操作 `!`;
 - 如果写入不成功，那就一直执行循环，直到写入成功；
+- 当然，由我们之前对`slowpath`和`LoadExclusive / StoreExclusive`的分析，可知：预测分析执行循环的概率比较低，只有在线程数据竞争的时候发生；正常情况下，是不会进入循环的(执行一次`do`)；
 - 有点`自旋锁`的味道，慢慢体会；
