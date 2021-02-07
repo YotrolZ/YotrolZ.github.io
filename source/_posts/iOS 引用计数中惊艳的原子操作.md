@@ -271,7 +271,7 @@ StoreExclusive(uintptr_t *dst, uintptr_t oldvalue, uintptr_t value)
     - 比如：此刻期望将数据修改为10，但是由于多线程的缘故，此刻内存中的真实值并不一定为10，如果不为10，就不执行写入操作；
 
 
-# `do while` 循环的作用
+# do while 循环的作用
 ```c++
 // 简化代码
 objc_object::rootRetain()
