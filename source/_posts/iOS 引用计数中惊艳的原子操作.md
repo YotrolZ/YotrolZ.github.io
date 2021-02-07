@@ -107,13 +107,13 @@ objc_object::rootRetain(bool tryRetain, bool handleOverflow)
 
 # 源码中发现的问题
 
-- 问题①：为什么要加一个 do while 循环？
+- 问题①：为什么要加一个 `do while` 循环？
 - 问题②：`newisa.bits = addc(newisa.bits, RC_ONE, 0, &carry);`为什么不需要`加锁`等相关操作，那么该操作如何保证`线程同步`的呢？
 
 - *一个猜想*： 莫非这个`addc`加一操作是通过 `do while` 来实现`原子操作`的？
 
 
-# 简化代码
+# 简化源码
 
 - 精简掉 关于 `SideTable` 存储引用计数的部分及 `isa.extra_rc++` 溢出后的处理
 
