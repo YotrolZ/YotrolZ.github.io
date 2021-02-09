@@ -263,7 +263,7 @@ StoreExclusive(uintptr_t *dst, uintptr_t oldvalue, uintptr_t value)
 }
 ```
 
-#### `__sync_bool_compare_and_swap` 内置函数
+### `__sync_bool_compare_and_swap` 内置函数
 
 - `Compare And Swap`，简称`CAS`;
 - 简单来说就是，在`写入`新值之前， 先根据`内存地址`读出`此刻内存真实值`，然后与`此刻操作期望值`进行比较，当且仅当`此刻内存真实值`与`此刻操作期望值`一致时，才将`此刻操作期望值`写入，并返回`true`。
