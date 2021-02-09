@@ -170,7 +170,7 @@ objc_object::rootRetain(bool tryRetain, bool handleOverflow)
 - `__x86_64__  ||  __i386__`
 
 
-![objc_object 相关方法列表](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/objc_object-rootRetain.jpg)
+![LoadExclusive & StoreExclusive](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/objc_object-rootRetain.jpg)
 
 
 > 我们先从 __arm64__ 开始分析
