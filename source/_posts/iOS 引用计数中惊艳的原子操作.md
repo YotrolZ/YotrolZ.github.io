@@ -176,7 +176,7 @@ objc_object::rootRetain()
     isa_t oldRC; // 用于存储此刻内存中的真实值
     isa_t newRC; // 用于存储此刻操作期的期望值
     
-    oldRC = &isa.RC // 从内存中读取此刻真实值
+    oldRC = &isa.RC // 从内存中读取此刻真实值(这里不够严谨，为便于理解)
 
     do {
         newRC++; // 引用计数加一操作
