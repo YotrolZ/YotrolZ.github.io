@@ -1,5 +1,6 @@
 ---
 title: arm64与LP64的区别
+abbrlink: 1c118e9a
 date: 2021-02-23 19:36:26
 tags:
 ---
