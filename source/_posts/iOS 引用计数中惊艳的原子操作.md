@@ -36,6 +36,9 @@ tags:
 #endif
 ```
 
+![objc_object 相关方法列表](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/objc-object.h.jpg)
+
+
 我们这里只分析`SUPPORT_NONPOINTER_ISA`下的`objc_object::rootRetain`，具体源码如下：
 
 - 调用`retain`，其实会来到这里，不做过多解释；
@@ -165,6 +168,10 @@ objc_object::rootRetain(bool tryRetain, bool handleOverflow)
 - `__arm64__`
 - `__arm__`
 - `__x86_64__  ||  __i386__`
+
+
+![objc_object 相关方法列表](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/objc_object-rootRetain.jpg)
+
 
 > 我们先从 __arm64__ 开始分析
 
