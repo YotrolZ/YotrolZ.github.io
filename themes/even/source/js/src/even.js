@@ -7,7 +7,7 @@
 
   Even.prototype.setup = function() {
     var leancloud = this.config.leancloud;
-    var isMobile = navigator.userAgent.match(/mobile/i);
+    var isMobile = window.navigator.userAgent.match(/mobile/i);
     this.navbar();
     this.responsiveTable();
 
@@ -15,7 +15,7 @@
       this.scrollToc();
       this.tocFollow();
     }
-    if (isMobile && this.config.fancybox) {
+    if (!isMobile && this.config.fancybox) {
       this.fancybox();
     }
     if (leancloud.app_id && leancloud.app_key) {
