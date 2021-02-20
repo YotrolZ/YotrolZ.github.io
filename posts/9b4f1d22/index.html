@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="设计模式01--简单工厂模式(iOS)"/><link rel="alternate" href="/atom.xml" title="YotrolZ" type="application/atom+xml"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
+<link rel="canonical" href="http://yotrolz.com/posts/9b4f1d22/"/>
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-138610487-3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-138610487-3');
+</script><script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":"","latex":false};
+</script>
+
+    <title>设计模式01--简单工厂模式(iOS) - YotrolZ</title>
+  <meta name="generator" content="Hexo 5.2.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">YotrolZ</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">Home
+          </li>
+      </a><a href="/archives/">
+        <li class="mobile-menu-item">Archives
+          </li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags
+          </li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">YotrolZ</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            Home
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            Archives
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/tags/">
+            Tags
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/categories/">
+            Categories
+            </a>
+        </li>
+      </ul></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">设计模式01--简单工厂模式(iOS)
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2021-12-15
+        </span></div>
+    </header>
+
+    <div class="post-content"><blockquote>
+<p><strong>1、简单工厂模式简述</strong></p>
+</blockquote>
+<ul>
+<li>简单工厂模式（FACTORY）,通过面向对象的封装，继承和多态来降低程序的耦合度。将一个具体类的实例化交给一个静态工厂方法来执行。</li>
+</ul>
+<blockquote>
+<p><strong>2、简单工厂模式角色划分</strong></p>
+</blockquote>
+<ul>
+<li><strong>工厂类</strong>：包含了创建具体类的静态方法，负责生产；</li>
+<li><strong>抽象产品</strong>：定义简单工厂中要返回的产品；用<code>抽象类</code>表示，由于OC中无抽象类的概念，可以使用<code>协议（Protocol）</code>来表示；</li>
+<li><strong>具体产品</strong>：具体生产的产品。是抽象产品的子类(继承自抽象类)，在OC中就是遵守上述<code>协议（Protocol）</code>。</li>
+</ul>
+<blockquote>
+<p><strong>3、简单工厂模式类图</strong></p>
+</blockquote>
+<ul>
+<li><img src="http://upload-images.jianshu.io/upload_images/590107-be044ef4d46c361d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="简单工厂模式"></li>
+</ul>
+<blockquote>
+<p><strong>4、简单工厂模式示意代码</strong></p>
+</blockquote>
+<ul>
+<li><p>抽象产品：<code>YCar</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@protocol YCar &lt;NSObject&gt;</span><br><span class="line">- (void)run;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>具体产品：<code>YAudi</code>、<code>YBenz</code>、<code>YLandRover</code></p>
+<ul>
+<li>.h文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@interface YAudi : NSObject &lt;YCar&gt;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@interface YBenz : NSObject &lt;YCar&gt;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@interface YLandRover : NSObject &lt;YCar&gt;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure></li>
+<li>.m文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">@implementation YAudi</span><br><span class="line">- (void)run &#123;</span><br><span class="line">    NSLog(@&quot;奥迪车跑起来了&quot;);</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation YBenz</span><br><span class="line">- (void)run &#123;</span><br><span class="line">    NSLog(@&quot;奔驰车跑起来了&quot;);</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation YLandRover</span><br><span class="line">- (void)run &#123;</span><br><span class="line">    NSLog(@&quot;路虎车跑起来了&quot;);</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>工厂类：<code>YCarFactory</code></p>
+<ul>
+<li>YCarFactory.h<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">+ (id&lt;YCar&gt;)creatCarWithCarType:(YCarType)carType;</span><br></pre></td></tr></table></figure></li>
+<li>YCarFactory.m<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">+ (id&lt;YCar&gt;)creatCarWithCarType:(YCarType)carType &#123;</span><br><span class="line">    switch (carType) &#123;</span><br><span class="line">        case YCarTypeAudi:</span><br><span class="line">            return [[YAudi alloc] init];</span><br><span class="line">            break;</span><br><span class="line">        case YCarTypeBenz:</span><br><span class="line">            return [[YBenz alloc] init];</span><br><span class="line">            break;</span><br><span class="line">        case YCarTypeLandRover:</span><br><span class="line">            return [[YLandRover alloc] init];</span><br><span class="line">            break;</span><br><span class="line">          </span><br><span class="line">        default:</span><br><span class="line">            return nil;</span><br><span class="line">            break;</span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>Client使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">id&lt;YCar&gt; car &#x3D; [YCarFactory creatCarWithCarType:YCarTypeBenz];</span><br><span class="line">[car run];</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 运行结果：奔驰车跑起来了</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<blockquote>
+<p>5、<strong>简单工厂模式总结</strong></p>
+</blockquote>
+<ul>
+<li><p>优点</p>
+<ul>
+<li>工厂类内部含有创建具体产品的逻辑，外界只需要向工厂类请求所需的产品即可，不需要关心产品实现细节；</li>
+</ul>
+</li>
+<li><p>缺点</p>
+<ul>
+<li>工厂类内部集中了创建具体产品的逻辑，假如我们需要新添加一种产品，就要修改工厂类，进行参数判断，<code>无法使用其子类继承进行扩展</code>。</li>
+</ul>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/YotrolZ/DesignPatterns-OC">完整Demo</a></p>
+</li>
+</ul>
+
+      </div>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>Author: </span>
+      <a href="http://yotrolz.com">YotrolZ</a>
+    </p>
+    <p class="copyright-item">
+      <span>Link: </span>
+      <a href="http://yotrolz.com/posts/9b4f1d22/">http://yotrolz.com/posts/9b4f1d22/</a>
+    </p>
+    <p class="copyright-item">
+      <span>License: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="next" href="/posts/ba9af90f/">
+        <span class="next-text nav-default">YYCache源码学习</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="social-links"></div><div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2015 - 2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">YotrolZ</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</body>
+</html>
