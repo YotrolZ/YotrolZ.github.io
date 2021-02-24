@@ -106,6 +106,28 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/posts/ae72db13/">发现App占用磁盘空间瞬间变的很大很大.想必是这个问题</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2016-04-09
+        </span></div>
+    </header>
+
+    <div class="post-content"><p>这些天在开发公司产品新版本、开发中突然注意到我们的App占用了我5个多G的磁盘空间,况且我还是经常重装调试，想必这肯定是哪里出现了问题,回家后用越狱机查看该App磁盘文件占用情况,发现了这5个G左右的磁盘占用基本都来此一个出处:沙盒中<code>temp</code>文件夹下的一个名为<code>stack-logs.xxxxx.index</code>的文件,查阅资料后发现这与Xcode设置有关,突然想起来,前几天调试BUG将<code>Scheme</code>中的<code>logging</code>选项下的<code>Malloc Stack</code>给打钩了,想必肯定是此处忘记取消打钩了.<br>于是乎做了如下验证,将<code>Mallo Stack</code>取消打钩,重装App,用pp助手检测该App占用磁盘空间,发现在<code>tmp</code>下并没有发现之前的那个文件<code>stack-logs.xxxxx.index</code>,磁盘占用量也处于稳定状态(1~2M),并没有出现暴涨的情况,看来真是这个东西在做鬼.<br>为了更加认定是这个<code>Malloc Stack</code>在做鬼,于是又将<code>Mallo Stack</code>打钩,问题又出现了,刚装App,用PP助手立即查看App磁盘占用,瞬间已经暴涨到了<code>80+M</code>,哎呀我的小心脏,查看文件结构后发现,又是<code>tmp</code>下的<code>stack-logs.xxxxx.index</code>在做鬼,上图留念一下:</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/590107-03e73a7087fd90f1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="App沙盒目录"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/590107-c2e5c564caecd32e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="沙盒tmp文件夹下"></p>
+<p>随手滑动了几下,又切换了几个页面便是这样一种情况,吓人啊.</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/590107-ebbd1d11fef3bc07.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="随手滑动了几下之后"></p>
+<p>此时此刻你还在什么,如果遇见类似问题立马查看你是不是也将<code>Malloc Stack</code>给打钩了(<code>Malloc Stack</code>设置如下图);</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/590107-abc4f4aa3e7dd1f2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Malloc Stack 设置页面"></p>
+<p>最后,如果细心的同学在App运行的时候能在控制器看到类似的话语</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/590107-1c20c587763ce727.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="开启Malloc Stack后控制台提示"></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/posts/ef008c28/">二维码</a>
         </h1>
 
@@ -524,31 +546,6 @@
 </ul>
           <div class="read-more">
             <a href="/posts/aec6074c/" class="read-more-link">Read more..</a>
-          </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/posts/4eef1362/">iOS判断屏幕横屏/竖屏</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2015-08-16
-        </span><span class="post-category">
-            <a href="/categories/iOS/">iOS</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><ul>
-<li><p>在屏幕发生翻转的时候会调用一些方法:</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewWillLayoutSubviews;</span><br><span class="line">- (<span class="keyword">void</span>)viewDidLayoutSubviews;</span><br><span class="line">- (<span class="keyword">void</span>)viewWillTransitionToSize:(<span class="built_in">CGSize</span>)size withTransitionCoordinator:(<span class="keyword">id</span> &lt;<span class="built_in">UIViewControllerTransitionCoordinator</span>&gt;)coordinator</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>注意:这些方法都是在<code>ViewController</code>里面,在<code>view</code>中没有的</p>
-</li>
-</ul>
-          <div class="read-more">
-            <a href="/posts/4eef1362/" class="read-more-link">Read more..</a>
           </div>
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/2/">

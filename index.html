@@ -203,6 +203,82 @@
         </div></article>
       <article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/posts/a1b1e2bc/">self和super关键字</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2019-02-25
+        </span></div>
+    </header>
+
+    <div class="post-content"><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> ()</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;self:%@&quot;</span>, <span class="built_in">NSStringFromClass</span>([<span class="keyword">self</span> <span class="keyword">class</span>]));</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;super:%@&quot;</span>, <span class="built_in">NSStringFromClass</span>([<span class="keyword">super</span> <span class="keyword">class</span>]));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 打印结果：</span></span><br><span class="line"><span class="comment">self:ViewController</span></span><br><span class="line"><span class="comment">super:ViewController</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>分析</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc ViewController.m -o ViewController.cpp</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 核心代码如下</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// NSStringFromClass([self class])</span></span><br><span class="line"><span class="built_in">NSStringFromClass</span>(</span><br><span class="line">  objc_msgSend(</span><br><span class="line">    (<span class="keyword">id</span>)<span class="keyword">self</span>, </span><br><span class="line">    sel_registerName(<span class="string">&quot;class&quot;</span>)</span><br><span class="line">  )</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// NSStringFromClass([super class])</span></span><br><span class="line"><span class="built_in">NSStringFromClass</span>(</span><br><span class="line">  objc_msgSendSuper(</span><br><span class="line">    &#123;</span><br><span class="line">      (<span class="keyword">id</span>)<span class="keyword">self</span>, </span><br><span class="line">      (<span class="keyword">id</span>)class_getSuperclass(objc_getClass(<span class="string">&quot;ViewController&quot;</span>))</span><br><span class="line">    &#125;, </span><br><span class="line">    sel_registerName(<span class="string">&quot;class&quot;</span>)</span><br><span class="line">  )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>看一下<code>objc_msgSend</code>的定义：</p>
+<h2 id="objc-msgSend"><a href="#objc-msgSend" class="headerlink" title="objc_msgSend"></a><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/objectivec/1456712-objc_msgsend">objc_msgSend</a></h2><ul>
+<li>Sends a message with a simple return value to an instance of a class.</li>
+<li>Declaration<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> objc_msgSend(<span class="keyword">void</span>);</span><br></pre></td></tr></table></figure></li>
+<li>Parameters<ul>
+<li>self<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A pointer that points to the instance of the class that is to receive the message.</span><br><span class="line">译：指向要接收消息的类的实例的指针。</span><br></pre></td></tr></table></figure></li>
+<li>op<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">The selector of the method that handles the message.</span><br><span class="line">译：处理消息的方法的选择器。</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>…<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A variable argument list containing the arguments to the method.</span><br><span class="line">译：包含该方法参数的可变参数列表。</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<ul>
+<li>Return Value<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">The return value of the method.</span><br><span class="line">译：方法的返回值。</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<h2 id="objc-msgSendSuper"><a href="#objc-msgSendSuper" class="headerlink" title="objc_msgSendSuper"></a><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/objectivec/1456716-objc_msgsendsuper">objc_msgSendSuper</a></h2><ul>
+<li>Sends a message with a simple return value to the superclass of an instance of a class.</li>
+<li>Declaration<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> objc_msgSendSuper(<span class="keyword">void</span>);</span><br></pre></td></tr></table></figure></li>
+<li>Parameters<ul>
+<li>self<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A pointer to an objc_super data structure. Pass values identifying the context the message was sent to, including the instance of the class that is to receive the message and the superclass at which to start searching for the method implementation.</span><br><span class="line">译：指向结构体objc_super的指针。传递用于标识消息发送到的上下文的值，包括将接收消息的类的实例以及从其开始搜索方法实现的父类。</span><br></pre></td></tr></table></figure></li>
+<li>op<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A pointer of type SEL. Pass the selector of the method that will handle the message.</span><br><span class="line">译：类型的指针SEL。传递将处理消息的方法的选择器。</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>…<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A variable argument list containing the arguments to the method.</span><br><span class="line">译：包含该方法参数的可变参数列表。</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<ul>
+<li>Return Value<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">The return value of the method identified by op.</span><br><span class="line">译：由标识的方法的返回值op。</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<p>所以核心代码也就是如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 核心代码如下</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// NSStringFromClass([self class])</span></span><br><span class="line"><span class="built_in">NSStringFromClass</span>(</span><br><span class="line">  objc_msgSend(</span><br><span class="line">    (<span class="keyword">id</span>)<span class="keyword">self</span>, <span class="comment">// 指向要接收消息的类的实例的指针</span></span><br><span class="line">    sel_registerName(<span class="string">&quot;class&quot;</span>)</span><br><span class="line">  )</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// NSStringFromClass([super class])</span></span><br><span class="line"><span class="built_in">NSStringFromClass</span>(</span><br><span class="line">  objc_msgSendSuper(</span><br><span class="line">    &#123;</span><br><span class="line">      (<span class="keyword">id</span>)<span class="keyword">self</span>, <span class="comment">// 指向要接收消息的类的实例的指针</span></span><br><span class="line">      (<span class="keyword">id</span>)class_getSuperclass(objc_getClass(<span class="string">&quot;ViewController&quot;</span>))</span><br><span class="line">    &#125;, </span><br><span class="line">    sel_registerName(<span class="string">&quot;class&quot;</span>)</span><br><span class="line">  )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>由于指向要接收消息的类的实例的指针都是<code>self</code>,所以打印都是<code>ViewController</code></p>
+<p>区别：</p>
+<p><code>[self class]</code> 从当前类开始找<code>class</code>方法</p>
+<p><code>[super class]</code> 从当前累的父类开始找<code>class</code>方法</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/posts/7e500fcd/">iOS设置单个圆角(cornerRadius)和单边阴影(shaodwRadius)</a>
         </h1>
 
@@ -379,122 +455,6 @@
 </li>
 <li><p>SingletonB</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;*********  SingletonB.h   **********&#x2F;</span><br><span class="line">@interface YSingletonB : NSObject &lt;NSCopying, NSMutableCopying&gt;</span><br><span class="line">+ (instancetype)sharedInstance;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">&#x2F;*********  SingletonB.m   **********&#x2F;</span><br><span class="line">@implementation YSingletonB</span><br><span class="line"></span><br><span class="line">static YSingletonB *_instance &#x3D; nil;</span><br><span class="line">+ (instancetype)sharedInstance &#123;</span><br><span class="line">    return [[self alloc] init];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">+ (instancetype)allocWithZone:(struct _NSZone *)zone &#123;</span><br><span class="line">    static dispatch_once_t onceToken;</span><br><span class="line">    dispatch_once(&amp;onceToken, ^&#123;</span><br><span class="line">        _instance &#x3D; [super allocWithZone:zone];</span><br><span class="line">    &#125;);</span><br><span class="line">    return _instance;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (id)copyWithZone:(NSZone *)zone &#123;</span><br><span class="line">    return _instance;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (id)mutableCopyWithZone:(NSZone *)zone &#123;</span><br><span class="line">    return _instance;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">&#x2F;*********  使用   **********&#x2F;</span><br><span class="line">YSingletonB *singleton1 &#x3D; [YSingletonB sharedInstance];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton1);</span><br><span class="line">YSingletonB *singleton2 &#x3D; [YSingletonB sharedInstance];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton2);</span><br><span class="line"></span><br><span class="line">YSingletonB *singleton3 &#x3D; [[YSingletonB alloc] init];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton3);</span><br><span class="line">YSingletonB *singleton4 &#x3D; [[YSingletonB alloc] init];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton4);</span><br><span class="line"></span><br><span class="line">YSingletonB *singleton5 &#x3D; [YSingletonB new];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton5);</span><br><span class="line">YSingletonB *singleton6 &#x3D; [YSingletonB new];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton6);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">YSingletonB *singleton7 &#x3D; [singleton5 copy];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton7);</span><br><span class="line">YSingletonB *singleton8 &#x3D; [singleton5 mutableCopy];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton8);</span><br><span class="line"></span><br><span class="line">&#x2F;*</span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"> </span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"> </span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"> </span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"></span><br><span class="line">YSingletonB调用sharedInstance方法，alloc，init方法，new方法，甚至包括copy、mutableCopy方法我们得到的都是用一个实例</span><br><span class="line"> *&#x2F;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><a target="_blank" rel="noopener" href="https://github.com/YotrolZ/DesignPatterns-OC">完整Demo</a></p>
-</li>
-</ul>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/posts/3fd3799f/">设计模式04--建造者模式(iOS)</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2018-01-02
-        </span></div>
-    </header>
-
-    <div class="post-content"><blockquote>
-<p><strong>1、建造者模式简述</strong></p>
-</blockquote>
-<ul>
-<li><code>建造者模式</code>(Builder)，又叫<code>生成器模式</code>将一个<code>复杂对象</code>的构建与它的表示分离，使得<code>同样的构建过程</code>可以创建<code>不同的表示</code>；</li>
-<li>如果使用了建造者模式，用户就只需要指定需要构建的类型，而具体的构建细节无需知道。</li>
-</ul>
-<blockquote>
-<p><strong>2、建造者模式角色划分</strong></p>
-</blockquote>
-<ul>
-<li><p><strong>抽象建造者：Builder</strong></p>
-<ul>
-<li>为创建一个Product对象的各个部分指定抽象接口；</li>
-<li>一般至少会有两个抽象方法，一个用来建造产品，一个是用来返回产品。</li>
-</ul>
-</li>
-<li><p><strong>具体建造者：ConcreteBuilder</strong></p>
-<ul>
-<li>实现抽象建造者的接口，具体的去构建各个部分；</li>
-</ul>
-</li>
-<li><p><strong>具体产品：Product</strong></p>
-<ul>
-<li>就是我们所需要的具体产品；</li>
-<li>由多个部件组成；</li>
-</ul>
-</li>
-<li><p><strong>指挥者：Director</strong></p>
-<ul>
-<li>负责调用适当的建造者来构建我们需要的产品；</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p><strong>3、建造者模式UML类图</strong></p>
-</blockquote>
-<ul>
-<li><img src="http://upload-images.jianshu.io/upload_images/590107-2b0ef7a4f4c3410f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="建造者模式"></li>
-</ul>
-<blockquote>
-<p><strong>4、建造者模式示意代码</strong></p>
-</blockquote>
-<ul>
-<li><p><strong>抽象建造者：<code>YAbsComputerBuilder</code></strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">@protocol YAbsComputerBuilder &lt;NSObject&gt;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建主板 *&#x2F;</span><br><span class="line">- (void)buildMainboard;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建处理器 *&#x2F;</span><br><span class="line">- (void)buildCPU;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建显卡 *&#x2F;</span><br><span class="line">- (void)buildGPU;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建内存 *&#x2F;</span><br><span class="line">- (void)buildMemoryDisk;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建硬盘 *&#x2F;</span><br><span class="line">- (void)buildHardDisk;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建显示器 *&#x2F;</span><br><span class="line">- (void)buildDisplay;</span><br><span class="line"></span><br><span class="line">&#x2F;** 获取构建好的具体产品 *&#x2F;</span><br><span class="line">- (YComputer *)getBuidResult;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>具体建造者：ConcreteBuilder</strong></p>
-<ul>
-<li><p>普通电脑建造者：**<code>YNormalComputerBuilder</code>**</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">@implementation YNormalComputerBuilder</span><br><span class="line">&#123;</span><br><span class="line">    YComputer *_computer;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (instancetype)init &#123;</span><br><span class="line">    if (self &#x3D; [super init]) &#123;</span><br><span class="line">        _computer &#x3D; [[YComputer alloc] init];</span><br><span class="line">    &#125;</span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建主板 *&#x2F;</span><br><span class="line">- (void)buildMainboard &#123;</span><br><span class="line">    _computer.mainboard &#x3D; @&quot;技嘉 H110M-DS2V主板&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建处理器 *&#x2F;</span><br><span class="line">- (void)buildCPU &#123;</span><br><span class="line">    _computer.cpu &#x3D; @&quot;intel i3处理器&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建显卡 *&#x2F;</span><br><span class="line">- (void)buildGPU &#123;</span><br><span class="line">    _computer.gpu &#x3D; @&quot;集成显卡&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建内存 *&#x2F;</span><br><span class="line">- (void)buildMemoryDisk &#123;</span><br><span class="line">    _computer.memoryDisk &#x3D; @&quot;金士顿 4G内存&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建硬盘 *&#x2F;</span><br><span class="line">- (void)buildHardDisk &#123;</span><br><span class="line">    _computer.hardDisk &#x3D; @&quot;500G 机械硬盘&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建显示器 *&#x2F;</span><br><span class="line">- (void)buildDisplay &#123;</span><br><span class="line">    _computer.display &#x3D; @&quot;13存 2K显示器&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (YComputer *)getBuidResult &#123;</span><br><span class="line">    return _computer;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>高配电脑建造者：**<code>YAdvancedComputerBuilder</code>**</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">@implementation YAdvancedComputerBuilder</span><br><span class="line">&#123;</span><br><span class="line">    YComputer *_computer;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (instancetype)init &#123;</span><br><span class="line">    if (self &#x3D; [super init]) &#123;</span><br><span class="line">        _computer &#x3D; [[YComputer alloc] init];</span><br><span class="line">     &#125;</span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建主板 *&#x2F;</span><br><span class="line">- (void)buildMainboard &#123;</span><br><span class="line">    _computer.mainboard &#x3D; @&quot;技嘉 X299 UD4主板&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建处理器 *&#x2F;</span><br><span class="line">- (void)buildCPU &#123;</span><br><span class="line">    _computer.cpu &#x3D; @&quot;intel i9处理器&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建显卡 *&#x2F;</span><br><span class="line">- (void)buildGPU &#123;</span><br><span class="line">    _computer.gpu &#x3D; @&quot;GTX1080显卡&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建内存 *&#x2F;</span><br><span class="line">- (void)buildMemoryDisk &#123;</span><br><span class="line">    _computer.memoryDisk &#x3D; @&quot;金士顿 16G内存&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建硬盘 *&#x2F;</span><br><span class="line">- (void)buildHardDisk &#123;</span><br><span class="line">    _computer.hardDisk &#x3D; @&quot;1T 固态硬盘&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;** 构建显示器 *&#x2F;</span><br><span class="line">- (void)buildDisplay &#123;</span><br><span class="line">    _computer.display &#x3D; @&quot;27存 4K显示器&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (YComputer *)getBuidResult &#123;</span><br><span class="line">    return _computer;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-<li><p><strong>具体产品：<code>YComputer</code></strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">@interface YComputer : NSObject</span><br><span class="line"></span><br><span class="line">@property (nonatomic, copy)NSString *mainboard;  &#x2F;&#x2F;!&lt; 主板</span><br><span class="line">@property (nonatomic, copy)NSString *cpu;        &#x2F;&#x2F;!&lt; 处理器</span><br><span class="line">@property (nonatomic, copy)NSString *gpu;        &#x2F;&#x2F;!&lt; 显卡</span><br><span class="line">@property (nonatomic, copy)NSString *memoryDisk; &#x2F;&#x2F;!&lt; 内存</span><br><span class="line">@property (nonatomic, copy)NSString *hardDisk;   &#x2F;&#x2F;!&lt; 硬盘</span><br><span class="line">@property (nonatomic, copy)NSString *display;    &#x2F;&#x2F;!&lt; 显示器</span><br><span class="line"></span><br><span class="line">&#x2F;** 用于展示商品 *&#x2F;</span><br><span class="line">- (void)show;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">@implementation YComputer</span><br><span class="line"></span><br><span class="line">- (void)show &#123;</span><br><span class="line">    NSLog(@&quot;&lt;&lt;&lt;&lt;电脑的配置单&gt;&gt;&gt;&gt;&quot;);</span><br><span class="line">    NSLog(@&quot;主板:  %@&quot;, self.mainboard);</span><br><span class="line">    NSLog(@&quot;CPU:  %@&quot;, self.cpu);</span><br><span class="line">    NSLog(@&quot;GPU:  %@&quot;, self.gpu);</span><br><span class="line">    NSLog(@&quot;内存:  %@&quot;, self.memoryDisk);</span><br><span class="line">    NSLog(@&quot;硬盘:  %@&quot;, self.hardDisk);</span><br><span class="line">    NSLog(@&quot;显示器: %@\n&quot;, self.display);</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>指挥者：<code>YComputerDirector</code></strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@interface YComputerDirector : NSObject</span><br><span class="line"></span><br><span class="line">- (void)constructWithBuilder:(id &lt;YAbsComputerBuilder&gt;)builder;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>Client</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 指挥者</span><br><span class="line">YComputerDirector *director &#x3D; [[YComputerDirector alloc] init];</span><br><span class="line">  </span><br><span class="line">&#x2F;&#x2F; 建造者</span><br><span class="line">YNormalComputerBuilder *normalBuilder &#x3D; [[YNormalComputerBuilder alloc] init];</span><br><span class="line">YAdvancedComputerBuilder *advBuilder &#x3D; [[YAdvancedComputerBuilder alloc] init];</span><br><span class="line">  </span><br><span class="line">&#x2F;&#x2F; &lt;普通电脑&gt;装配、构建</span><br><span class="line">[director constructWithBuilder:normalBuilder];</span><br><span class="line">&#x2F;&#x2F; 具体产品</span><br><span class="line">YComputer *normalComputer &#x3D; [normalBuilder getBuidResult];</span><br><span class="line">&#x2F;&#x2F; 展示产品</span><br><span class="line">[normalComputer show];</span><br><span class="line">  </span><br><span class="line">&#x2F;&#x2F; &lt;高配电脑&gt;装配、构建</span><br><span class="line">[director constructWithBuilder:advBuilder];</span><br><span class="line">&#x2F;&#x2F; 具体产品</span><br><span class="line">YComputer *advComputer &#x3D; [advBuilder getBuidResult];</span><br><span class="line">&#x2F;&#x2F; 展示产品</span><br><span class="line">[advComputer show];</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 运行结果：</span><br><span class="line">&lt;&lt;&lt;&lt;电脑配置单&gt;&gt;&gt;&gt;</span><br><span class="line">主板:  技嘉 H110M-DS2V主板</span><br><span class="line">CPU:  intel i3处理器</span><br><span class="line">GPU:  集成显卡</span><br><span class="line">内存:  金士顿 4G内存</span><br><span class="line">硬盘:  500G 机械硬盘</span><br><span class="line">显示器: 13存 2K显示器</span><br><span class="line"></span><br><span class="line">&lt;&lt;&lt;&lt;电脑配置单&gt;&gt;&gt;&gt;</span><br><span class="line">主板:  技嘉 X299 UD4主板</span><br><span class="line">CPU:  intel i9处理器</span><br><span class="line">GPU:  GTX1080显卡</span><br><span class="line">内存:  金士顿 16G内存</span><br><span class="line">硬盘:  1T 固态硬盘</span><br><span class="line">显示器: 27存 4K显示器</span><br></pre></td></tr></table></figure>
-
-
-</li>
-</ul>
-<blockquote>
-<p><strong>5、建造者模式总结</strong></p>
-</blockquote>
-<ul>
-<li><p>优点：</p>
-<ul>
-<li>使用建造者模式可以使客户端不必知道产品内部的构建细节；</li>
-<li>Builder之间是相互独立的，与其它的Builder无关，便于系统的扩展；</li>
-</ul>
-</li>
-<li><p>与**<code>工厂模式</code>**的区别：</p>
-<ul>
-<li><p>建造者模式比工厂模式多了一个指挥者(Direcitor)角色；</p>
-</li>
-<li><p>意图不同：</p>
-<ul>
-<li><p><strong>工厂模式</strong>：关注的是产品整体；我们需要什么产品，共产就给我我们什么产品；</p>
-</li>
-<li><p><strong>建造者模式</strong>：关注的是产品组成部分的构建过程；将一个复杂对象的构建与它的表示分离，使得同样的构建过程可以创建不同的表示，而调用者不需要知道这些细节；</p>
-</li>
-<li><p>产品复杂度不同：</p>
-<ul>
-<li><strong>工厂模式</strong>：一般都是单一性质产品；</li>
-<li><strong>建造者模式</strong>：复合型产品；它由各个部件组合而成，部件不同造成的产品也截然不同；</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
 </li>
 <li><p><a target="_blank" rel="noopener" href="https://github.com/YotrolZ/DesignPatterns-OC">完整Demo</a></p>
 </li>
