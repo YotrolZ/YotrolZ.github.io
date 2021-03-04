@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="ARM64汇编小知识"/><link rel="alternate" href="/atom.xml" title="YotrolZ" type="application/atom+xml"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.11.0" />
+<link rel="canonical" href="http://yotrolz.com/posts/14ba70d9/"/>
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css" />
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.11.0" />
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-138610487-3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-138610487-3');
+</script><script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":"","latex":false};
+</script>
+
+    <title>ARM64汇编小知识 - YotrolZ</title>
+  <meta name="generator" content="Hexo 5.2.0"></head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">YotrolZ</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/">
+        <li class="mobile-menu-item">Home
+          </li>
+      </a><a href="/archives/">
+        <li class="mobile-menu-item">Archives
+          </li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags
+          </li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">YotrolZ</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/">
+            Home
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            Archives
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/tags/">
+            Tags
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/categories/">
+            Categories
+            </a>
+        </li>
+      </ul></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">ARM64汇编小知识
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-01-25
+        </span></div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">Contents</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-text">寄存器</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%9A%E7%94%A8%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-text">通用寄存器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E8%AE%A1%E6%95%B0%E5%99%A8"><span class="toc-text">程序计数器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A0%86%E6%A0%88%E6%8C%87%E9%92%88"><span class="toc-text">堆栈指针</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%93%BE%E6%8E%A5%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-text">链接寄存器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E7%8A%B6%E6%80%81%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-text">程序状态寄存器</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4"><span class="toc-text">常用指令</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#MOV"><span class="toc-text">MOV</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ADD"><span class="toc-text">ADD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SUB"><span class="toc-text">SUB</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CMP"><span class="toc-text">CMP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E6%8C%87%E4%BB%A4"><span class="toc-text">条件指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text"></span></a></li></ol></li></ol></li></ol>
+    </div>
+  </div><div class="post-content"><h1 id="寄存器"><a href="#寄存器" class="headerlink" title="寄存器"></a>寄存器</h1><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">&lt;UIKit/UIKit.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&quot;AppDelegate.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> main(<span class="keyword">int</span> argc, <span class="keyword">char</span> * argv[]) &#123;</span><br><span class="line">    <span class="built_in">NSString</span> * appDelegateClassName; <span class="comment">// ⬅ 在此处打上断点，进入lldb</span></span><br><span class="line">    <span class="keyword">@autoreleasepool</span> &#123;</span><br><span class="line">        <span class="comment">// Setup code that might create autoreleased objects goes here.</span></span><br><span class="line">        appDelegateClassName = <span class="built_in">NSStringFromClass</span>([AppDelegate <span class="keyword">class</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">UIApplicationMain</span>(argc, argv, <span class="literal">nil</span>, appDelegateClassName);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">(lldb) <span class="keyword">register</span> read</span><br><span class="line">General Purpose Registers:</span><br><span class="line">  x0 = <span class="number">0x000000016d79f808</span></span><br><span class="line">  x1 = <span class="number">0x000000016d79f868</span></span><br><span class="line">  x2 = <span class="number">0x000000016d79f878</span></span><br><span class="line">  x3 = <span class="number">0x000000016d79f928</span></span><br><span class="line">  x4 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x5 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x6 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x7 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x8 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x9 = <span class="number">0x7e666f59e9480095</span></span><br><span class="line">  x10 = <span class="number">0x0000000102660968</span>  `_mh_execute_header + <span class="number">2408</span></span><br><span class="line">  x11 = <span class="number">0x0000000080000028</span></span><br><span class="line">  x12 = <span class="number">0x0000000080000028</span></span><br><span class="line">  x13 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x14 = <span class="number">0x0000000000000881</span></span><br><span class="line">  x15 = <span class="number">0x000000000000000c</span></span><br><span class="line">  x16 = <span class="number">0x000000010266606c</span>  `main at main.m:<span class="number">11</span></span><br><span class="line">  x17 = <span class="number">0x0000000102710ed8</span>  dyld`vtable <span class="keyword">for</span> ImageLoaderMachOCompressed + <span class="number">16</span></span><br><span class="line">  x18 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x19 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x20 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x21 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x22 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x23 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x24 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x25 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x26 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x27 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x28 = <span class="number">0x000000016d79f858</span></span><br><span class="line">  fp = <span class="number">0x000000016d79f820</span></span><br><span class="line">  lr = <span class="number">0x00000001a45766b0</span>  libdyld.dylib`start + <span class="number">4</span></span><br><span class="line">  sp = <span class="number">0x000000016d79f7f0</span></span><br><span class="line">  pc = <span class="number">0x000000010266608c</span>  `main + <span class="number">32</span> at main.m:<span class="number">12</span>:<span class="number">16</span></span><br><span class="line">cpsr = <span class="number">0x60000000</span></span><br><span class="line"></span><br><span class="line">(lldb) </span><br></pre></td></tr></table></figure>
+
+<h2 id="通用寄存器"><a href="#通用寄存器" class="headerlink" title="通用寄存器"></a>通用寄存器</h2><ul>
+<li><p><code>x0 ~ x28</code>: 64bit; </p>
+</li>
+<li><p><code>w0 ~ w28</code>: 32bit;(属于x0 ~ x28的低32bit)</p>
+</li>
+</ul>
+<h2 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h2><ul>
+<li>pc (Program Counter)</li>
+<li>记录CPU当前指令是哪一条指令</li>
+</ul>
+<h2 id="堆栈指针"><a href="#堆栈指针" class="headerlink" title="堆栈指针"></a>堆栈指针</h2><ul>
+<li>sp (Stack Pointer)</li>
+<li>fp (frame Pointer)</li>
+</ul>
+<h2 id="链接寄存器"><a href="#链接寄存器" class="headerlink" title="链接寄存器"></a>链接寄存器</h2><ul>
+<li>lr (Link Register)</li>
+<li>存储着函数的返回地址</li>
+</ul>
+<h2 id="程序状态寄存器"><a href="#程序状态寄存器" class="headerlink" title="程序状态寄存器"></a>程序状态寄存器</h2><ul>
+<li>cpsr (Current Program Status Register)</li>
+<li>spsr (Saved Program Status Register)异常状态下使用</li>
+</ul>
+<h1 id="常用指令"><a href="#常用指令" class="headerlink" title="常用指令"></a>常用指令</h1><h2 id="MOV"><a href="#MOV" class="headerlink" title="MOV"></a>MOV</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MOV &#123;条件&#125; &#123;S&#125; 目的寄存器，源操作数</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>MOV指令可完成从另一个寄存器、被移位的寄存器或将一个立即数加载到目的寄存器。其中S选项决定指令的操作是否影响CPSR中条件标志位的值，当没有S时指令不更新CPSR中条件标志位的值。</p>
+</li>
+<li><p>指令示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MOV w8, #0x1      ;将立即数1传送到寄存器w8</span><br><span class="line">MOV R1, R0        ;将寄存器RO的值传送到寄存器R1</span><br><span class="line">MOV PC, R14       ;将寄存器R14的值传送到PC,常用于子程序返回</span><br><span class="line">MOV R1, RO, LSL#3 ;将寄存器RO的值左移3位后传送到R1</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<h2 id="ADD"><a href="#ADD" class="headerlink" title="ADD"></a>ADD</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ADD &#123;条件&#125; &#123;S&#125; 目的寄存器, 操作数1, 操作数2</span><br></pre></td></tr></table></figure>
+<ul>
+<li>ADD指令用于把两个操作数相加，并将结果存放到目的寄存器中。</li>
+<li>操作数1应是一个<code>寄存器</code>;</li>
+<li>操作数2可以是一个<code>寄存器</code>，<code>被移位的寄存器</code>，或一个<code>立即数</code>。</li>
+</ul>
+<p>指令示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ADD RO, R1, R2        ;RO &#x3D; R1 + R2</span><br><span class="line">ADD R0, R1, #0x1      ;R0 &#x3D; R1 + 1</span><br><span class="line">ADD RO, R2, R3, LSL#1 ;R0 &#x3D; R2 + (R3&lt;&lt;1)</span><br></pre></td></tr></table></figure>
+
+<h2 id="SUB"><a href="#SUB" class="headerlink" title="SUB"></a>SUB</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SUB &#123;条件&#125; &#123;S&#125; 目的寄存器, 操作数1, 操作数2</span><br></pre></td></tr></table></figure>
+<ul>
+<li>SUB指令用于把操作数1减去操作数2,并将结果存放到目的寄存器中；</li>
+<li>该指令可用于有符号或无符数的减法运算；</li>
+<li>操作数1应是一个寄存器；</li>
+<li>操作数2可以是一个寄存器，被移位的寄存器，或一个立即数；</li>
+</ul>
+<p>指令示例:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SUB RO, R1, R2        ;RO &#x3D; R1 - R2</span><br><span class="line">SUB R0, R1, #0x1      ;RO &#x3D; R1 - 1</span><br><span class="line">SUB RO, R2, R3, LSL#1 ;RO &#x3D; R2 - (R3&lt;&lt;1)</span><br></pre></td></tr></table></figure>
+
+<h2 id="CMP"><a href="#CMP" class="headerlink" title="CMP"></a>CMP</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CMP &#123;条件&#125; 操作数1, 操作数2</span><br></pre></td></tr></table></figure>
+<ul>
+<li>CMP指令用于把-一个寄存器的内容和另一个寄存器的内容或立即数进行比较，同时更新CPSR中条件标志位的值。该指令进行一次减法运算，但不存储结果，只更改条件标志位。标志位表示的是操作数1与操作数2的关系(大、小、相等)，例如，当操作数1大于操作操作数2,则此后的有GT后缀的指令将可以执行。</li>
+</ul>
+<p>指令示例:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CMP R1, R0   ;将寄存器R1的值与寄存器RO的值相减，并根据结果设置CPSR的标志位</span><br><span class="line">CMP R1, #0x1 ;将寄存器R1的值与立即数1相减，并根据结果设置CPSR的标志位</span><br></pre></td></tr></table></figure>
+<h2 id="条件指令"><a href="#条件指令" class="headerlink" title="条件指令"></a>条件指令</h2><h3 id=""><a href="#" class="headerlink" title=""></a></h3>
+      </div>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>Author: </span>
+      <a href="http://yotrolz.com">YotrolZ</a>
+    </p>
+    <p class="copyright-item">
+      <span>Link: </span>
+      <a href="http://yotrolz.com/posts/14ba70d9/">http://yotrolz.com/posts/14ba70d9/</a>
+    </p>
+    <p class="copyright-item">
+      <span>License: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+      <footer class="post-footer">
+        
+        <nav class="post-nav"><a class="prev" href="/posts/d910df91/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">OpenGL_Mac平台搭建OpenGL环境</span>
+        <span class="prev-text nav-mobile">Prev</span>
+      </a>
+    <a class="next" href="/posts/edadc223/">
+        <span class="next-text nav-default">iOS逆向-SSH WiFi连接不上</span>
+        <span class="prev-text nav-mobile">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="social-links"></div><div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2015 - 2021<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">YotrolZ</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.11.0"></script>
+</body>
+</html>

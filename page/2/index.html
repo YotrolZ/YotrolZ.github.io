@@ -106,6 +106,160 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/posts/14ba70d9/">ARM64汇编小知识</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-01-25
+        </span></div>
+    </header>
+
+    <div class="post-content"><h1 id="寄存器"><a href="#寄存器" class="headerlink" title="寄存器"></a>寄存器</h1><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">&lt;UIKit/UIKit.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&quot;AppDelegate.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> main(<span class="keyword">int</span> argc, <span class="keyword">char</span> * argv[]) &#123;</span><br><span class="line">    <span class="built_in">NSString</span> * appDelegateClassName; <span class="comment">// ⬅ 在此处打上断点，进入lldb</span></span><br><span class="line">    <span class="keyword">@autoreleasepool</span> &#123;</span><br><span class="line">        <span class="comment">// Setup code that might create autoreleased objects goes here.</span></span><br><span class="line">        appDelegateClassName = <span class="built_in">NSStringFromClass</span>([AppDelegate <span class="keyword">class</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">UIApplicationMain</span>(argc, argv, <span class="literal">nil</span>, appDelegateClassName);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">(lldb) <span class="keyword">register</span> read</span><br><span class="line">General Purpose Registers:</span><br><span class="line">  x0 = <span class="number">0x000000016d79f808</span></span><br><span class="line">  x1 = <span class="number">0x000000016d79f868</span></span><br><span class="line">  x2 = <span class="number">0x000000016d79f878</span></span><br><span class="line">  x3 = <span class="number">0x000000016d79f928</span></span><br><span class="line">  x4 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x5 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x6 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x7 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x8 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x9 = <span class="number">0x7e666f59e9480095</span></span><br><span class="line">  x10 = <span class="number">0x0000000102660968</span>  `_mh_execute_header + <span class="number">2408</span></span><br><span class="line">  x11 = <span class="number">0x0000000080000028</span></span><br><span class="line">  x12 = <span class="number">0x0000000080000028</span></span><br><span class="line">  x13 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x14 = <span class="number">0x0000000000000881</span></span><br><span class="line">  x15 = <span class="number">0x000000000000000c</span></span><br><span class="line">  x16 = <span class="number">0x000000010266606c</span>  `main at main.m:<span class="number">11</span></span><br><span class="line">  x17 = <span class="number">0x0000000102710ed8</span>  dyld`vtable <span class="keyword">for</span> ImageLoaderMachOCompressed + <span class="number">16</span></span><br><span class="line">  x18 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x19 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x20 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x21 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x22 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x23 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x24 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x25 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x26 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x27 = <span class="number">0x0000000000000000</span></span><br><span class="line">  x28 = <span class="number">0x000000016d79f858</span></span><br><span class="line">  fp = <span class="number">0x000000016d79f820</span></span><br><span class="line">  lr = <span class="number">0x00000001a45766b0</span>  libdyld.dylib`start + <span class="number">4</span></span><br><span class="line">  sp = <span class="number">0x000000016d79f7f0</span></span><br><span class="line">  pc = <span class="number">0x000000010266608c</span>  `main + <span class="number">32</span> at main.m:<span class="number">12</span>:<span class="number">16</span></span><br><span class="line">cpsr = <span class="number">0x60000000</span></span><br><span class="line"></span><br><span class="line">(lldb) </span><br></pre></td></tr></table></figure>
+
+<h2 id="通用寄存器"><a href="#通用寄存器" class="headerlink" title="通用寄存器"></a>通用寄存器</h2><ul>
+<li><p><code>x0 ~ x28</code>: 64bit; </p>
+</li>
+<li><p><code>w0 ~ w28</code>: 32bit;(属于x0 ~ x28的低32bit)</p>
+</li>
+</ul>
+<h2 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h2><ul>
+<li>pc (Program Counter)</li>
+<li>记录CPU当前指令是哪一条指令</li>
+</ul>
+<h2 id="堆栈指针"><a href="#堆栈指针" class="headerlink" title="堆栈指针"></a>堆栈指针</h2><ul>
+<li>sp (Stack Pointer)</li>
+<li>fp (frame Pointer)</li>
+</ul>
+<h2 id="链接寄存器"><a href="#链接寄存器" class="headerlink" title="链接寄存器"></a>链接寄存器</h2><ul>
+<li>lr (Link Register)</li>
+<li>存储着函数的返回地址</li>
+</ul>
+<h2 id="程序状态寄存器"><a href="#程序状态寄存器" class="headerlink" title="程序状态寄存器"></a>程序状态寄存器</h2><ul>
+<li>cpsr (Current Program Status Register)</li>
+<li>spsr (Saved Program Status Register)异常状态下使用</li>
+</ul>
+<h1 id="常用指令"><a href="#常用指令" class="headerlink" title="常用指令"></a>常用指令</h1><h2 id="MOV"><a href="#MOV" class="headerlink" title="MOV"></a>MOV</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MOV &#123;条件&#125; &#123;S&#125; 目的寄存器，源操作数</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>MOV指令可完成从另一个寄存器、被移位的寄存器或将一个立即数加载到目的寄存器。其中S选项决定指令的操作是否影响CPSR中条件标志位的值，当没有S时指令不更新CPSR中条件标志位的值。</p>
+</li>
+<li><p>指令示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MOV w8, #0x1      ;将立即数1传送到寄存器w8</span><br><span class="line">MOV R1, R0        ;将寄存器RO的值传送到寄存器R1</span><br><span class="line">MOV PC, R14       ;将寄存器R14的值传送到PC,常用于子程序返回</span><br><span class="line">MOV R1, RO, LSL#3 ;将寄存器RO的值左移3位后传送到R1</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<h2 id="ADD"><a href="#ADD" class="headerlink" title="ADD"></a>ADD</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ADD &#123;条件&#125; &#123;S&#125; 目的寄存器, 操作数1, 操作数2</span><br></pre></td></tr></table></figure>
+<ul>
+<li>ADD指令用于把两个操作数相加，并将结果存放到目的寄存器中。</li>
+<li>操作数1应是一个<code>寄存器</code>;</li>
+<li>操作数2可以是一个<code>寄存器</code>，<code>被移位的寄存器</code>，或一个<code>立即数</code>。</li>
+</ul>
+<p>指令示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ADD RO, R1, R2        ;RO &#x3D; R1 + R2</span><br><span class="line">ADD R0, R1, #0x1      ;R0 &#x3D; R1 + 1</span><br><span class="line">ADD RO, R2, R3, LSL#1 ;R0 &#x3D; R2 + (R3&lt;&lt;1)</span><br></pre></td></tr></table></figure>
+
+<h2 id="SUB"><a href="#SUB" class="headerlink" title="SUB"></a>SUB</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SUB &#123;条件&#125; &#123;S&#125; 目的寄存器, 操作数1, 操作数2</span><br></pre></td></tr></table></figure>
+<ul>
+<li>SUB指令用于把操作数1减去操作数2,并将结果存放到目的寄存器中；</li>
+<li>该指令可用于有符号或无符数的减法运算；</li>
+<li>操作数1应是一个寄存器；</li>
+<li>操作数2可以是一个寄存器，被移位的寄存器，或一个立即数；</li>
+</ul>
+<p>指令示例:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SUB RO, R1, R2        ;RO &#x3D; R1 - R2</span><br><span class="line">SUB R0, R1, #0x1      ;RO &#x3D; R1 - 1</span><br><span class="line">SUB RO, R2, R3, LSL#1 ;RO &#x3D; R2 - (R3&lt;&lt;1)</span><br></pre></td></tr></table></figure>
+
+<h2 id="CMP"><a href="#CMP" class="headerlink" title="CMP"></a>CMP</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CMP &#123;条件&#125; 操作数1, 操作数2</span><br></pre></td></tr></table></figure>
+<ul>
+<li>CMP指令用于把-一个寄存器的内容和另一个寄存器的内容或立即数进行比较，同时更新CPSR中条件标志位的值。该指令进行一次减法运算，但不存储结果，只更改条件标志位。标志位表示的是操作数1与操作数2的关系(大、小、相等)，例如，当操作数1大于操作操作数2,则此后的有GT后缀的指令将可以执行。</li>
+</ul>
+<p>指令示例:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CMP R1, R0   ;将寄存器R1的值与寄存器RO的值相减，并根据结果设置CPSR的标志位</span><br><span class="line">CMP R1, #0x1 ;将寄存器R1的值与立即数1相减，并根据结果设置CPSR的标志位</span><br></pre></td></tr></table></figure>
+<h2 id="条件指令"><a href="#条件指令" class="headerlink" title="条件指令"></a>条件指令</h2><h3 id=""><a href="#" class="headerlink" title=""></a></h3>
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/posts/edadc223/">iOS逆向-SSH WiFi连接不上</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-01-20
+        </span></div>
+    </header>
+
+    <div class="post-content"><blockquote>
+<p>SSH WiFi的方法链接不上的解决方法</p>
+</blockquote>
+<ul>
+<li><p>如果你在SSH WiFi链接越狱设备的时候卡住,如下:可以试试下面的方法:<br><img src="http://upload-images.jianshu.io/upload_images/590107-26ecc271b7cbcce9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="卡住无反应"></p>
+</li>
+<li><p>注:一般越狱机的系统在iOS 10以上会出现SSH WiFi链接不上的问题</p>
+</li>
+<li><p>iOS 10的越狱环境已经自带了SSH,我们不需要安装 open SSH 了,直接去Cydia里面卸载!</p>
+</li>
+</ul>
+<p>-下面开始操作:</p>
+<ul>
+<li>1.先用USB链接越狱设备,可以通过PP助手进入<code>/private/var/containers/Bundle/Application/xxxxx-xxxxx-xxxxx/yalu102.app/</code>,这里的<code>xxxxxxx-xxxxxx-xxxxx</code>一般是一堆数字,最笨的方法就是挨个点击进入看看有否有<code>yalu102.app</code>,找到后我们进行下一步;<br><img src="http://upload-images.jianshu.io/upload_images/590107-87a2f706c9d5fd14.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="yalu102目录"></li>
+</ul>
+<ul>
+<li><p>2.进入<code>yalu 102.app</code>,找到<code>dropbear.plist</code>文件<br><img src="http://upload-images.jianshu.io/upload_images/590107-78d2518d534387ae.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="dropbear.plist"></p>
+</li>
+<li><p>3.打开<code>dropbear.plist</code>文件,将<code>127.0.0.1:22</code>修改成<code>22</code>,如下:<br><img src="http://upload-images.jianshu.io/upload_images/590107-492b59c7e6261913.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="将127.0.0.1:22修改成22"></p>
+</li>
+<li><p>4.修改完成后保存,再次打开查看是否修改成功,如果没有成功的话,可以将<code>dropbear.plist</code>文件导出到Mac修改,然后将修改后的<code>dropbear.plist</code>文件再导入到原来的位置进行替换即可</p>
+</li>
+<li><ol start="5">
+<li>确保修改成功后,将<code>越狱设备重启</code>,此时你可能还需要重新激活越狱环境;</li>
+</ol>
+</li>
+<li><p>6.激活越狱环境后,快来试试 SSH WiFi链接吧;<br><code>ssh root@你的设备ip</code></p>
+</li>
+</ul>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/posts/1ba78291/">设计模式05--单例模式(iOS)</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-01-05
+        </span></div>
+    </header>
+
+    <div class="post-content"><blockquote>
+<p><strong>1、单例模式简述</strong></p>
+</blockquote>
+<ul>
+<li>一个类有且仅有<code>一个实例</code>，并且自行实例化向整个系统提供。</li>
+</ul>
+<blockquote>
+<p><strong>2、单例模式UML类图</strong></p>
+</blockquote>
+<ul>
+<li><img src="http://upload-images.jianshu.io/upload_images/590107-c019777dc26e8a1a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="单例模式"></li>
+</ul>
+<blockquote>
+<p><strong>3、单例模式示意代码</strong></p>
+</blockquote>
+<ul>
+<li><p><strong><code>SingletonA</code></strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;*********  SingletonA.h   **********&#x2F;</span><br><span class="line">@interface YSingletonA : NSObject</span><br><span class="line">+ (instancetype)sharedInstance;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">&#x2F;*********  SingletonA.m   **********&#x2F;</span><br><span class="line">@implementation YSingletonA</span><br><span class="line"></span><br><span class="line">static YSingletonA *_instance &#x3D; nil;</span><br><span class="line">+ (instancetype)sharedInstance &#123;</span><br><span class="line">    static dispatch_once_t onceToken;</span><br><span class="line">    dispatch_once(&amp;onceToken, ^&#123;</span><br><span class="line">        _instance &#x3D; [[[self class] alloc] init];</span><br><span class="line">    &#125;);</span><br><span class="line">    return _instance;</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">&#x2F;*********  使用   **********&#x2F;</span><br><span class="line">YSingletonA *singleton1 &#x3D; [YSingletonA sharedInstance];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton1);</span><br><span class="line">YSingletonA *singleton2 &#x3D; [YSingletonA sharedInstance];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton2);</span><br><span class="line"></span><br><span class="line">YSingletonA *singleton3 &#x3D; [[YSingletonA alloc] init];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton3);</span><br><span class="line">YSingletonA *singleton4 &#x3D; [[YSingletonA alloc] init];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton4);</span><br><span class="line"></span><br><span class="line">YSingletonA *singleton5 &#x3D; [YSingletonA new];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton5);</span><br><span class="line">YSingletonA *singleton6 &#x3D; [YSingletonA new];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton6);</span><br><span class="line"></span><br><span class="line">&#x2F;*</span><br><span class="line"> 运行结果：</span><br><span class="line"> &lt;YSingletonA: 0x60000000b550&gt;</span><br><span class="line"> &lt;YSingletonA: 0x60000000b550&gt;</span><br><span class="line"> </span><br><span class="line"> &lt;YSingletonA: 0x60c00000bc30&gt;</span><br><span class="line"> &lt;YSingletonA: 0x60400000b440&gt;</span><br><span class="line"> </span><br><span class="line"> &lt;YSingletonA: 0x60400000b450&gt;</span><br><span class="line"> &lt;YSingletonA: 0x60c00000a9f0&gt;</span><br><span class="line"></span><br><span class="line">YSingletonA调用sharedInstance方法可以做到多次创建的实例是同一个</span><br><span class="line">但是&lt;无法做到&gt;调用原有的init方法或者new方法创建的实例也是同一个</span><br><span class="line">YSingletonA违背了单例类有且仅有一个实例的定义,或者说做的不够完善</span><br><span class="line"> *&#x2F;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>SingletonB</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;*********  SingletonB.h   **********&#x2F;</span><br><span class="line">@interface YSingletonB : NSObject &lt;NSCopying, NSMutableCopying&gt;</span><br><span class="line">+ (instancetype)sharedInstance;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">&#x2F;*********  SingletonB.m   **********&#x2F;</span><br><span class="line">@implementation YSingletonB</span><br><span class="line"></span><br><span class="line">static YSingletonB *_instance &#x3D; nil;</span><br><span class="line">+ (instancetype)sharedInstance &#123;</span><br><span class="line">    return [[self alloc] init];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">+ (instancetype)allocWithZone:(struct _NSZone *)zone &#123;</span><br><span class="line">    static dispatch_once_t onceToken;</span><br><span class="line">    dispatch_once(&amp;onceToken, ^&#123;</span><br><span class="line">        _instance &#x3D; [super allocWithZone:zone];</span><br><span class="line">    &#125;);</span><br><span class="line">    return _instance;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (id)copyWithZone:(NSZone *)zone &#123;</span><br><span class="line">    return _instance;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (id)mutableCopyWithZone:(NSZone *)zone &#123;</span><br><span class="line">    return _instance;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">&#x2F;*********  使用   **********&#x2F;</span><br><span class="line">YSingletonB *singleton1 &#x3D; [YSingletonB sharedInstance];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton1);</span><br><span class="line">YSingletonB *singleton2 &#x3D; [YSingletonB sharedInstance];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton2);</span><br><span class="line"></span><br><span class="line">YSingletonB *singleton3 &#x3D; [[YSingletonB alloc] init];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton3);</span><br><span class="line">YSingletonB *singleton4 &#x3D; [[YSingletonB alloc] init];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton4);</span><br><span class="line"></span><br><span class="line">YSingletonB *singleton5 &#x3D; [YSingletonB new];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton5);</span><br><span class="line">YSingletonB *singleton6 &#x3D; [YSingletonB new];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton6);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">YSingletonB *singleton7 &#x3D; [singleton5 copy];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton7);</span><br><span class="line">YSingletonB *singleton8 &#x3D; [singleton5 mutableCopy];</span><br><span class="line">NSLog(@&quot;%@&quot;, singleton8);</span><br><span class="line"></span><br><span class="line">&#x2F;*</span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"> </span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"> </span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"> </span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"> &lt;YSingletonB: 0x6080000069a0&gt;</span><br><span class="line"></span><br><span class="line">YSingletonB调用sharedInstance方法，alloc，init方法，new方法，甚至包括copy、mutableCopy方法我们得到的都是用一个实例</span><br><span class="line"> *&#x2F;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/YotrolZ/DesignPatterns-OC">完整Demo</a></p>
+</li>
+</ul>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/posts/3fd3799f/">设计模式04--建造者模式(iOS)</a>
         </h1>
 
@@ -804,107 +958,6 @@
 
 
 
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/posts/2b53fdc4/">nonnull、nullable、null_resettable、__null_unspecified</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2016-11-21
-        </span></div>
-    </header>
-
-    <div class="post-content"><blockquote>
-<p>nonnull : 不能为空</p>
-</blockquote>
-<ul>
-<li>使用方法:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@property (nonatomic, copy, nonnull) NSString   *name1;</span><br><span class="line">@property (nonatomic, copy) NSString * _Nonnull  name2;</span><br><span class="line">@property (nonatomic, copy) NSString * __nonnull name3;</span><br></pre></td></tr></table></figure>
-<img src="http://upload-images.jianshu.io/upload_images/590107-92c4b5de1d6b1c4a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="nonnull三种用法"></li>
-</ul>
-<blockquote>
-<p>nullable : 可以为空</p>
-</blockquote>
-<ul>
-<li>使用方法:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@property (nonatomic, copy, nullable)  NSString  *name1;</span><br><span class="line">@property (nonatomic, copy) NSString *_Nullable  name2;</span><br><span class="line">@property (nonatomic, copy) NSString *__nullable name3;</span><br></pre></td></tr></table></figure>
-<img src="http://upload-images.jianshu.io/upload_images/590107-829f408488ec279e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="nullable三种方法"></li>
-</ul>
-<blockquote>
-<p>null_resettable : get方法不能返回空, set方法可以为空</p>
-</blockquote>
-<ul>
-<li>使用方法:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@property (nonatomic, strong, null_resettable) NSString *name;</span><br></pre></td></tr></table></figure>
-<img src="http://upload-images.jianshu.io/upload_images/590107-9e558ca75d2e7a48.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="null_resettable使用方法.png"></li>
-</ul>
-<blockquote>
-<p>_Null_unspecified : 不确定是否为空</p>
-</blockquote>
-<ul>
-<li>使用方法:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@property (nonatomic, strong) NSString *_Null_unspecified  name1;</span><br><span class="line">@property (nonatomic, strong) NSString *__null_unspecified name2;</span><br></pre></td></tr></table></figure>
-<img src="http://upload-images.jianshu.io/upload_images/590107-02f4b7ee43b3fece.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="_Null_unspecified2种方法.png"></li>
-</ul>
-<p>注意点:</p>
-<blockquote>
-<p>不能修饰一般数据类型</p>
-</blockquote>
-<p><img src="http://upload-images.jianshu.io/upload_images/590107-599fa7f88114484f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="不能修饰一般数据类型"></p>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/posts/9d649d6a/">iOS 输入框(UITextField)密码明暗文切换</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2016-05-20
-        </span></div>
-    </header>
-
-    <div class="post-content"><p>在做明暗文切换(密码输入框)的时候遇见一个坑,就是切换<code>secureTextEntry</code>的时候,输入框的光标会偏移,下面列出了一个解决办法及一种明暗文切换的方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">- (IBAction)pwdTextSwitch:(UIButton *)sender &#123;</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F; 前提:在xib中设置按钮的默认与选中状态的背景图 </span><br><span class="line">    &#x2F;&#x2F; 切换按钮的状态</span><br><span class="line">    sender.selected &#x3D; !sender.selected;</span><br><span class="line">    </span><br><span class="line">    if (sender.selected) &#123; &#x2F;&#x2F; 按下去了就是明文</span><br><span class="line">        </span><br><span class="line">        NSString *tempPwdStr &#x3D; self.pwdInput.text;</span><br><span class="line">        self.pwdInput.text &#x3D; @&quot;&quot;; &#x2F;&#x2F; 这句代码可以防止切换的时候光标偏移</span><br><span class="line">        self.pwdInput.secureTextEntry &#x3D; NO;</span><br><span class="line">        self.pwdInput.text &#x3D; tempPwdStr;</span><br><span class="line">        </span><br><span class="line">    &#125; else &#123; &#x2F;&#x2F; 暗文</span><br><span class="line">        </span><br><span class="line">        NSString *tempPwdStr &#x3D; self.pwdInput.text;</span><br><span class="line">        self.pwdInput.text &#x3D; @&quot;&quot;;</span><br><span class="line">        self.pwdInput.secureTextEntry &#x3D; YES;</span><br><span class="line">        self.pwdInput.text &#x3D; tempPwdStr;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/posts/8d6a4db4/">删除Xcode Source Control多余的Working Copies</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2016-05-04
-        </span></div>
-    </header>
-
-    <div class="post-content"><p>由于公司最近开发新项目,在SVN上重新建了仓库,在一次提交代码的时候发现有点不对劲,莫名其妙的在Xcode <code>Source Control -&gt; Working Copies</code> 下有两个远程的仓库(一个是之前的老项目.一个是现在的新项目),见下图</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/590107-be6158dd2ee39871.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Working Copies"></p>
-<p>这个其实并不影响开发,但是对于强迫症的人来说也格外不爽,比如:(为了方便观看,将文件目录收缩了)<br><img src="http://upload-images.jianshu.io/upload_images/590107-6bb1c110d0fb14bb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="提交代码"></p>
-<p>每次提交为什么总是要提示老项目(表示已经被老项目折磨的体无完肤…)等等</p>
-<blockquote>
-<p>解决办法</p>
-</blockquote>
-<ul>
-<li>1.进入新项目的所在的文件夹-&gt;找到<code>项目名称.xcodeproj</code>-&gt; 右击:显示包内容</li>
-</ul>
-<p><img src="http://upload-images.jianshu.io/upload_images/590107-0e5d9a44e078f9f4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240"></p>
-<ul>
-<li>2.找到<code>project.xcworkspace</code>-&gt;右击:显示包内容</li>
-</ul>
-<p><img src="http://upload-images.jianshu.io/upload_images/590107-d995fea464962886.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240"></p>
-<ul>
-<li>3.找到<code>xcshareddata</code> -&gt; <code>项目名称.xcscmblueprint</code>文件,并且用文本编辑器打开</li>
-</ul>
-<p><img src="http://upload-images.jianshu.io/upload_images/590107-ab53a0430a05c603.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="文本编辑器打开:项目名称.xcscmblueprint"></p>
-<ul>
-<li>4.修改<code>项目名称.xcscmblueprint</code>文件<br>用文本编辑器打开后你会看到,大概是这个样子<br><img src="http://upload-images.jianshu.io/upload_images/590107-59d897ace6173d83.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="项目名称.xcscmblueprint"></li>
-</ul>
-<p>在<br><code>DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey </code><br><code>DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey </code><br><code>DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey </code><br><code>DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey </code><br>下面分别各有两个值,这就是问题的所在,我们只需删除我们不需要的并<code>保存</code>即可,见下图</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/590107-3ff455ea542968ea.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="删除不需要的并保存"></p>
-<ul>
-<li>5.重启Xcode</li>
-</ul>
-<p><img src="http://upload-images.jianshu.io/upload_images/590107-2f9d4b451ffcf5c6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="重启Xcode后Working Copies"></p>
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/">

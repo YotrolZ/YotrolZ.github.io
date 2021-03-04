@@ -106,6 +106,97 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/posts/428e23d5/">iOS程序启动过程（生命周期）</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2015-08-25
+        </span><span class="post-category">
+            <a href="/categories/iOS/">iOS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h3 id="1-main函数"><a href="#1-main函数" class="headerlink" title="1.main函数"></a>1.main函数</h3><h3 id="2-UIApplicationMain"><a href="#2-UIApplicationMain" class="headerlink" title="2.UIApplicationMain"></a>2.UIApplicationMain</h3><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> <span class="built_in">UIApplicationMain</span>(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[], <span class="built_in">NSString</span> *principalClassName, <span class="built_in">NSString</span> *delegateClassName);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>此函数会根据<code>principalClassName</code>创建<code>UIApplication</code>对象</li>
+<li>此函数会根据<code>delegateClassName</code>创建一个<code>delegate</code>对象</li>
+<li>并将该<code>delegate</code>对象赋值给<code>UIApplication</code>对象中的<code>delegate</code>属性</li>
+</ul>
+          <div class="read-more">
+            <a href="/posts/428e23d5/" class="read-more-link">Read more..</a>
+          </div>
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/posts/1ea19737/">iOS中传感器的基本使用</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2015-08-21
+        </span><span class="post-category">
+            <a href="/categories/iOS/">iOS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h2 id="iOS中常见的传感器"><a href="#iOS中常见的传感器" class="headerlink" title="iOS中常见的传感器"></a>iOS中常见的传感器</h2><p><img src="http://upload-images.jianshu.io/upload_images/590107-b80b8936f8277f84.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="iOS中常见的传感器"></p>
+          <div class="read-more">
+            <a href="/posts/1ea19737/" class="read-more-link">Read more..</a>
+          </div>
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/posts/aec6074c/">神奇的IB_DESIGNABLE和IBInspectable(xib中设置圆角)</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2015-08-16
+        </span><span class="post-category">
+            <a href="/categories/iOS/">iOS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><ul>
+<li><p>情景:在很多中情况下我们需要设置<code>UIView</code>或者<code>UIImageView</code>的圆角以及边框等,我们通常的做法是:</p>
+<ul>
+<li>1.代码创建的控件:利用代码设置<code>cornerRadius</code>(别忘记设置裁剪哦<code>masksToBounds = YES</code>)和<code>borderWidth</code>属性;</li>
+<li>2.在xib中你还有一种做法就是设置<code>Key Paht</code>;(注意:这里虽然设置了我们并不能立即在xib中看到设置后圆角效果,这是本文重点)<br><img src="http://upload-images.jianshu.io/upload_images/590107-9b78c886c474176c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="设置Key Paht"></li>
+<li>3.设置圆形图片的话,还可以画一个圆形图片,详情可以移步<a target="_blank" rel="noopener" href="http://www.jianshu.com/p/068d6f493547">这里</a>;</li>
+</ul>
+</li>
+<li><p>下面以在xib中设置圆角为例,说明<code>IB_DESIGNABLE</code>和<code>IBInspectable</code>的神奇之处:</p>
+</li>
+</ul>
+          <div class="read-more">
+            <a href="/posts/aec6074c/" class="read-more-link">Read more..</a>
+          </div>
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/posts/428e23d5/">iOS开发中设置圆角的几种方法</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2015-08-16
+        </span><span class="post-category">
+            <a href="/categories/iOS/">iOS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h4 id="方式一-设置layer相关的属性"><a href="#方式一-设置layer相关的属性" class="headerlink" title="方式一:设置layer相关的属性"></a>方式一:设置<em>layer</em>相关的属性</h4>
+          <div class="read-more">
+            <a href="/posts/428e23d5/" class="read-more-link">Read more..</a>
+          </div>
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/posts/4eef1362/">iOS判断屏幕横屏/竖屏</a>
         </h1>
 
@@ -127,25 +218,6 @@
 </ul>
           <div class="read-more">
             <a href="/posts/4eef1362/" class="read-more-link">Read more..</a>
-          </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/posts/428e23d5/">iOS开发中设置圆角的几种方法</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2015-08-16
-        </span><span class="post-category">
-            <a href="/categories/iOS/">iOS</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><h4 id="方式一-设置layer相关的属性"><a href="#方式一-设置layer相关的属性" class="headerlink" title="方式一:设置layer相关的属性"></a>方式一:设置<em>layer</em>相关的属性</h4>
-          <div class="read-more">
-            <a href="/posts/428e23d5/" class="read-more-link">Read more..</a>
           </div>
         </div></article>
       <article class="post">
@@ -260,48 +332,13 @@
             <a href="/posts/c8aae65b/" class="read-more-link">Read more..</a>
           </div>
         </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/posts/5fe4e0ec/">iOS中拉伸图片的几种方式</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2015-06-30
-        </span><span class="post-category">
-            <a href="/categories/iOS/">iOS</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><p>假如下面的一张图片，是用来做按钮的背景图片的，原始尺寸是(<code>128 * 112</code>)<br><img src="https://raw.githubusercontent.com/YotrolZ/hexo/master/img/590107-af6c569c9bf6a0f2.png" alt="按钮背景图片.png"></p>
-<p>我们通过代码将这张图片设置为按钮的背景图片，假如我们将创建好的按钮的宽高设置为:(<code>W=200, H=50</code>)代码如下:</p>
-          <div class="read-more">
-            <a href="/posts/5fe4e0ec/" class="read-more-link">Read more..</a>
-          </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/posts/1e6befc2/">自定义View的创建、添加、移除执行过程分析</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2015-06-28
-        </span><span class="post-category">
-            <a href="/categories/iOS/">iOS</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><h2 id="1-创建自定义view的类文件"><a href="#1-创建自定义view的类文件" class="headerlink" title="1.创建自定义view的类文件"></a>1.创建自定义view的类文件</h2><p><img src="https://raw.githubusercontent.com/YotrolZ/hexo/master/img/590107-0db614e19b98a250.png" alt="创建自定义view的类文件.png"></p>
-          <div class="read-more">
-            <a href="/posts/1e6befc2/" class="read-more-link">Read more..</a>
-          </div>
-        </div></article>
       <nav class="pagination"><a class="prev" href="/page/3/">
         <i class="iconfont icon-left"></i>
         <span class="prev-text">Prev</span>
+      </a>
+    <a class="next" href="/page/5/">
+        <span class="next-text">Next</span>
+        <i class="iconfont icon-right"></i>
       </a>
     </nav></section></div></div>
       </main>
