@@ -264,70 +264,10 @@
         </span></div>
     </header>
 
-    <div class="post-content"><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> ()</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;self:%@&quot;</span>, <span class="built_in">NSStringFromClass</span>([<span class="keyword">self</span> <span class="keyword">class</span>]));</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;super:%@&quot;</span>, <span class="built_in">NSStringFromClass</span>([<span class="keyword">super</span> <span class="keyword">class</span>]));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 打印结果：</span></span><br><span class="line"><span class="comment">self:ViewController</span></span><br><span class="line"><span class="comment">super:ViewController</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>分析</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc ViewController.m -o ViewController.cpp</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 核心代码如下</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// NSStringFromClass([self class])</span></span><br><span class="line"><span class="built_in">NSStringFromClass</span>(</span><br><span class="line">  objc_msgSend(</span><br><span class="line">    (<span class="keyword">id</span>)<span class="keyword">self</span>, </span><br><span class="line">    sel_registerName(<span class="string">&quot;class&quot;</span>)</span><br><span class="line">  )</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// NSStringFromClass([super class])</span></span><br><span class="line"><span class="built_in">NSStringFromClass</span>(</span><br><span class="line">  objc_msgSendSuper(</span><br><span class="line">    &#123;</span><br><span class="line">      (<span class="keyword">id</span>)<span class="keyword">self</span>, </span><br><span class="line">      (<span class="keyword">id</span>)class_getSuperclass(objc_getClass(<span class="string">&quot;ViewController&quot;</span>))</span><br><span class="line">    &#125;, </span><br><span class="line">    sel_registerName(<span class="string">&quot;class&quot;</span>)</span><br><span class="line">  )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<p>看一下<code>objc_msgSend</code>的定义：</p>
-<h2 id="objc-msgSend"><a href="#objc-msgSend" class="headerlink" title="objc_msgSend"></a><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/objectivec/1456712-objc_msgsend">objc_msgSend</a></h2><ul>
-<li>Sends a message with a simple return value to an instance of a class.</li>
-<li>Declaration<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> objc_msgSend(<span class="keyword">void</span>);</span><br></pre></td></tr></table></figure></li>
-<li>Parameters<ul>
-<li>self<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A pointer that points to the instance of the class that is to receive the message.</span><br><span class="line">译：指向要接收消息的类的实例的指针。</span><br></pre></td></tr></table></figure></li>
-<li>op<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">The selector of the method that handles the message.</span><br><span class="line">译：处理消息的方法的选择器。</span><br></pre></td></tr></table></figure>
-
-
-</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li>…<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A variable argument list containing the arguments to the method.</span><br><span class="line">译：包含该方法参数的可变参数列表。</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<ul>
-<li>Return Value<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">The return value of the method.</span><br><span class="line">译：方法的返回值。</span><br></pre></td></tr></table></figure>
-
-
-</li>
-</ul>
-<h2 id="objc-msgSendSuper"><a href="#objc-msgSendSuper" class="headerlink" title="objc_msgSendSuper"></a><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/objectivec/1456716-objc_msgsendsuper">objc_msgSendSuper</a></h2><ul>
-<li>Sends a message with a simple return value to the superclass of an instance of a class.</li>
-<li>Declaration<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> objc_msgSendSuper(<span class="keyword">void</span>);</span><br></pre></td></tr></table></figure></li>
-<li>Parameters<ul>
-<li>self<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A pointer to an objc_super data structure. Pass values identifying the context the message was sent to, including the instance of the class that is to receive the message and the superclass at which to start searching for the method implementation.</span><br><span class="line">译：指向结构体objc_super的指针。传递用于标识消息发送到的上下文的值，包括将接收消息的类的实例以及从其开始搜索方法实现的父类。</span><br></pre></td></tr></table></figure></li>
-<li>op<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A pointer of type SEL. Pass the selector of the method that will handle the message.</span><br><span class="line">译：类型的指针SEL。传递将处理消息的方法的选择器。</span><br></pre></td></tr></table></figure>
-
-
-</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li>…<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A variable argument list containing the arguments to the method.</span><br><span class="line">译：包含该方法参数的可变参数列表。</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<ul>
-<li>Return Value<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">The return value of the method identified by op.</span><br><span class="line">译：由标识的方法的返回值op。</span><br></pre></td></tr></table></figure>
-
-
-</li>
-</ul>
-<p>所以核心代码也就是如下：</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 核心代码如下</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// NSStringFromClass([self class])</span></span><br><span class="line"><span class="built_in">NSStringFromClass</span>(</span><br><span class="line">  objc_msgSend(</span><br><span class="line">    (<span class="keyword">id</span>)<span class="keyword">self</span>, <span class="comment">// 指向要接收消息的类的实例的指针</span></span><br><span class="line">    sel_registerName(<span class="string">&quot;class&quot;</span>)</span><br><span class="line">  )</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// NSStringFromClass([super class])</span></span><br><span class="line"><span class="built_in">NSStringFromClass</span>(</span><br><span class="line">  objc_msgSendSuper(</span><br><span class="line">    &#123;</span><br><span class="line">      (<span class="keyword">id</span>)<span class="keyword">self</span>, <span class="comment">// 指向要接收消息的类的实例的指针</span></span><br><span class="line">      (<span class="keyword">id</span>)class_getSuperclass(objc_getClass(<span class="string">&quot;ViewController&quot;</span>))</span><br><span class="line">    &#125;, </span><br><span class="line">    sel_registerName(<span class="string">&quot;class&quot;</span>)</span><br><span class="line">  )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<p>由于指向要接收消息的类的实例的指针都是<code>self</code>,所以打印都是<code>ViewController</code></p>
-<p>区别：</p>
-<p><code>[self class]</code> 从当前类开始找<code>class</code>方法</p>
-<p><code>[super class]</code> 从当前累的父类开始找<code>class</code>方法</p>
-
+    <div class="post-content"><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;self:%@&quot;</span>, <span class="built_in">NSStringFromClass</span>([<span class="keyword">self</span> <span class="keyword">class</span>]));</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@&quot;super:%@&quot;</span>, <span class="built_in">NSStringFromClass</span>([<span class="keyword">super</span> <span class="keyword">class</span>]));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 打印结果：</span></span><br><span class="line"><span class="comment">self:ViewController</span></span><br><span class="line"><span class="comment">super:ViewController</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+          <div class="read-more">
+            <a href="/posts/a1b1e2bc/" class="read-more-link">Read more..</a>
+          </div>
         </div></article>
       <article class="post">
     <header class="post-header">
