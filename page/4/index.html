@@ -106,6 +106,48 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/posts/94fd4f29/">UIWindow</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2015-08-25
+        </span></div>
+    </header>
+
+    <div class="post-content"><h3 id="UIWindow"><a href="#UIWindow" class="headerlink" title="UIWindow"></a>UIWindow</h3><ul>
+<li><p>1.<code>UIWindow</code>是一种特殊的UIView(继承自UIView)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@interface UIWindow : UIView</span><br></pre></td></tr></table></figure></li>
+<li><p>2.一个iOS程序之所以能显示到屏幕上，完全是因为它有UIWindow，也就说,<code>没有UIWindow，就看不见任何UI界面</code>,</p>
+</li>
+<li><p>3.AppDelegate内部默认有一个UIWindow对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@property (strong, nonatomic) UIWindow *window; &#x2F;&#x2F; 注意这里是strong</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>4.只有一个UIWindow也可以显示</p>
+</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/590107-50aa2d50410d9617.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="只有UIWindow的情况"></p>
+<ul>
+<li>5.给UIWindow添加一个view—<code>不能用该做法</code></li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/590107-0b2f159d608cb4f2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="在window上添加view"></p>
+<ul>
+<li>6.给UIWindow设置根控制器(会自动将控制器的view添加到UIWindow上)</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/590107-1450d63dc1862631.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="给window设置根控制器"></p>
+<ul>
+<li>7.<code>addSubView</code>和<code>rootViewController</code>的区别<ul>
+<li>直接用addSubView,控制器会被释放,控制器就不能处理事件(出现野指针错误)</li>
+<li>直接用addSubView,控制器的view不会跟随屏幕旋转而自动旋转。</li>
+<li>用rootViewController,控制器不会被释放,而且控制器的view会跟随屏幕旋转而自动旋转</li>
+<li>旋转事件-&gt;UIApplication -&gt;Window-&gt;rootViewController -&gt;旋转控制器的view</li>
+</ul>
+</li>
+</ul>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/posts/428e23d5/">iOS程序启动过程（生命周期）</a>
         </h1>
 
@@ -178,25 +220,6 @@
         </div></article>
       <article class="post">
     <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/posts/428e23d5/">iOS开发中设置圆角的几种方法</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2015-08-16
-        </span><span class="post-category">
-            <a href="/categories/iOS/">iOS</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><h4 id="方式一-设置layer相关的属性"><a href="#方式一-设置layer相关的属性" class="headerlink" title="方式一:设置layer相关的属性"></a>方式一:设置<em>layer</em>相关的属性</h4>
-          <div class="read-more">
-            <a href="/posts/428e23d5/" class="read-more-link">Read more..</a>
-          </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/posts/4eef1362/">iOS判断屏幕横屏/竖屏</a>
         </h1>
 
@@ -218,6 +241,25 @@
 </ul>
           <div class="read-more">
             <a href="/posts/4eef1362/" class="read-more-link">Read more..</a>
+          </div>
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/posts/428e23d5/">iOS开发中设置圆角的几种方法</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2015-08-16
+        </span><span class="post-category">
+            <a href="/categories/iOS/">iOS</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h4 id="方式一-设置layer相关的属性"><a href="#方式一-设置layer相关的属性" class="headerlink" title="方式一:设置layer相关的属性"></a>方式一:设置<em>layer</em>相关的属性</h4>
+          <div class="read-more">
+            <a href="/posts/428e23d5/" class="read-more-link">Read more..</a>
           </div>
         </div></article>
       <article class="post">
@@ -307,29 +349,6 @@
 <li>能节省CPU资源，提高程序的性能:该做事的时候就唤醒，没有事情就睡眠
           <div class="read-more">
             <a href="/posts/74e21f72/" class="read-more-link">Read more..</a>
-          </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/posts/c8aae65b/">iOS多线程的4种实现方案</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2015-07-11
-        </span><span class="post-category">
-            <a href="/categories/iOS/">iOS</a>
-            </span>
-        </div>
-    </header>
-
-    <div class="post-content"><h3 id="一、pthread-很少使用"><a href="#一、pthread-很少使用" class="headerlink" title="一、pthread(很少使用)"></a>一、pthread(很少使用)</h3><h4 id="简介"><a href="#简介" class="headerlink" title="简介:"></a>简介:</h4><ul>
-<li>一套通用的多线程API</li>
-<li>使用与Unix、Linux、Window等系统</li>
-<li>跨平台、可移植</li>
-<li>使用难度大
-          <div class="read-more">
-            <a href="/posts/c8aae65b/" class="read-more-link">Read more..</a>
           </div>
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/3/">

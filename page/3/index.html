@@ -106,6 +106,51 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/posts/da9fb1fe/">iOS中CoreAnimation的确认哪个动画结束(animationDidStop)</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2017-03-13
+        </span></div>
+    </header>
+
+    <div class="post-content"><p>在CoreAnimation中我们可以通过CAAnimation对象的delegate方法 <code>- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag</code>来完成动画结束后的一些操作,但是有时候会出现点问题,比如多个CAAnimation对象的delegate为同一个对象,这样就要区分是哪一个CAAnimation对象,我们可以通过<code>[xxx.layer animationForKey:@&quot;key&quot;]</code>来获取到一个CAAnimation对象,然后与<code>- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag</code>方法中的<code>anim </code>来比较,但是有时候总是不对,这是就要添加如下代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yourAnimtion.removedOnCompletion &#x3D; NO;</span><br></pre></td></tr></table></figure>
+<p>这样就可以通过<code>[xxx.layer animationForKey:@&quot;key&quot;];</code>查找到对应key的animation,接下来就可以接着添加你所需的该动画结束后的操作</p>
+<ul>
+<li>注意上面的方法是 <code>animationForKey :</code></li>
+</ul>
+<p>解决了上面的问题,不过一个循环引用的问题已可能悄悄发生了……</p>
+<p>如果我们给这段动画设置了:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yourAnimtion.delegate &#x3D; self;  </span><br></pre></td></tr></table></figure>
+<p>同时又让动画结束后不移除:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yourAnimtion.removedOnCompletion &#x3D; NO;</span><br></pre></td></tr></table></figure>
+
+<p>于是……<br>self持有yourView –&gt; yourView持有yourView.layer –&gt; yourView.layer持有yourAnimtion，yourAnimtion又持有self   ==&gt;  <code>循环引用</code></p>
+<p>那么为什么yourAnimtion会持有self 呢?</p>
+<p>是因为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yourAnimtion.delegate &#x3D; self;  </span><br></pre></td></tr></table></figure>
+
+<p>你肯定会想,delegate不会强引用self的,但是错了….请看下面的官方代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;* The delegate of the animation. This object is retained for the</span><br><span class="line"> * lifetime of the animation object. Defaults to nil. See below for the</span><br><span class="line"> * supported delegate methods. *&#x2F;</span><br><span class="line"></span><br><span class="line">@property(nullable, strong) id &lt;CAAnimationDelegate&gt; delegate;</span><br></pre></td></tr></table></figure>
+
+<p>上面用的  <code>strong </code>   有木有……</p>
+<p>解决循环引用的问题</p>
+<p>在动画结束的delegate方法中:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[yourView.layer removeAllAnimations];</span><br></pre></td></tr></table></figure>
+
+<p>或者:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[yourView.layer removeAnimationForKey:yourKey];</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/posts/2b53fdc4/">nonnull、nullable、null_resettable、__null_unspecified</a>
         </h1>
 
@@ -534,48 +579,6 @@
           <div class="read-more">
             <a href="/posts/c46b1cd/" class="read-more-link">Read more..</a>
           </div>
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/posts/94fd4f29/">UIWindow</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2015-08-25
-        </span></div>
-    </header>
-
-    <div class="post-content"><h3 id="UIWindow"><a href="#UIWindow" class="headerlink" title="UIWindow"></a>UIWindow</h3><ul>
-<li><p>1.<code>UIWindow</code>是一种特殊的UIView(继承自UIView)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@interface UIWindow : UIView</span><br></pre></td></tr></table></figure></li>
-<li><p>2.一个iOS程序之所以能显示到屏幕上，完全是因为它有UIWindow，也就说,<code>没有UIWindow，就看不见任何UI界面</code>,</p>
-</li>
-<li><p>3.AppDelegate内部默认有一个UIWindow对象</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@property (strong, nonatomic) UIWindow *window; &#x2F;&#x2F; 注意这里是strong</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>4.只有一个UIWindow也可以显示</p>
-</li>
-</ul>
-<p><img src="http://upload-images.jianshu.io/upload_images/590107-50aa2d50410d9617.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="只有UIWindow的情况"></p>
-<ul>
-<li>5.给UIWindow添加一个view—<code>不能用该做法</code></li>
-</ul>
-<p><img src="http://upload-images.jianshu.io/upload_images/590107-0b2f159d608cb4f2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="在window上添加view"></p>
-<ul>
-<li>6.给UIWindow设置根控制器(会自动将控制器的view添加到UIWindow上)</li>
-</ul>
-<p><img src="http://upload-images.jianshu.io/upload_images/590107-1450d63dc1862631.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="给window设置根控制器"></p>
-<ul>
-<li>7.<code>addSubView</code>和<code>rootViewController</code>的区别<ul>
-<li>直接用addSubView,控制器会被释放,控制器就不能处理事件(出现野指针错误)</li>
-<li>直接用addSubView,控制器的view不会跟随屏幕旋转而自动旋转。</li>
-<li>用rootViewController,控制器不会被释放,而且控制器的view会跟随屏幕旋转而自动旋转</li>
-<li>旋转事件-&gt;UIApplication -&gt;Window-&gt;rootViewController -&gt;旋转控制器的view</li>
-</ul>
-</li>
-</ul>
-
         </div></article>
       <nav class="pagination"><a class="prev" href="/page/2/">
         <i class="iconfont icon-left"></i>

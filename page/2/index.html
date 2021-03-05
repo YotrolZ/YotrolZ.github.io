@@ -106,6 +106,71 @@
         <div class="content-wrapper">
           <div id="content" class="content"><section id="posts" class="posts"><article class="post">
     <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/posts/d910df91/">OpenGL_Mac平台搭建OpenGL环境</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-03-16
+        </span></div>
+    </header>
+
+    <div class="post-content"><blockquote>
+<p><strong>1、创建一个Mac应用工程</strong></p>
+</blockquote>
+<ul>
+<li>打开Xcode –&gt; Creat a new Xcode project –&gt;  macOS –&gt; Cocoa App</li>
+<li><img src="https://upload-images.jianshu.io/upload_images/590107-f8f60fb967683126.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="新建一个Mac应用程序"></li>
+</ul>
+<blockquote>
+<p><strong>2、添加系统库</strong></p>
+</blockquote>
+<ul>
+<li>添加<code>OpenGL.framework</code> 和 <code>GLUT.framework</code>两个系统库</li>
+<li><img src="https://upload-images.jianshu.io/upload_images/590107-b4bea138cbde1fbf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="添加系统库"></li>
+</ul>
+<blockquote>
+<p><strong>3、添加OpenGL工具库，并在Bulid Settings 的 Header Search path 中配置 <code>CLTool.h</code> 和 <code>glew.h</code> 路径</strong></p>
+</blockquote>
+<ul>
+<li>文件(<code>include文件夹</code>和<code>libGLTools.a</code>)可从Demo中获取</li>
+<li><img src="https://upload-images.jianshu.io/upload_images/590107-6625ec3d1e626471.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="添加OpenGL工具库"></li>
+<li><img src="https://upload-images.jianshu.io/upload_images/590107-3e3dd9dcd3778f1e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="在Bulid Settings 的 Header Search path 中配置CLTool.h和glew.h的路径"></li>
+</ul>
+<blockquote>
+<p><strong>4、删除不需要的文件</strong></p>
+</blockquote>
+<ul>
+<li><img src="https://upload-images.jianshu.io/upload_images/590107-facfac519e0718e1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="删除选中的文件"></li>
+</ul>
+<blockquote>
+<p><strong>5、新建<code>main.cpp</code>文件</strong></p>
+</blockquote>
+<ul>
+<li><p><img src="https://upload-images.jianshu.io/upload_images/590107-1b839764b0a730f0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="新建文件并选择 C++ File"></p>
+</li>
+<li><p><img src="https://upload-images.jianshu.io/upload_images/590107-e57a6d78fa3647cc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="填写文件名称“main”，并取消打钩"></p>
+</li>
+</ul>
+<blockquote>
+<p><strong>6、修改main.cpp文件</strong></p>
+</blockquote>
+<ul>
+<li>在main.cpp文件中添加如下代码，先不用搞懂什么意思，后面再做介绍<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;GLTools.h&quot;</span><br><span class="line">#include &lt;GLUT&#x2F;GLUT.h&gt;</span><br><span class="line"></span><br><span class="line">void draw() &#123;</span><br><span class="line">    </span><br><span class="line">    glClear(GL_COLOR_BUFFER_BIT);</span><br><span class="line">    glColor3f(1.0f, 0.0f, 0.0f); </span><br><span class="line"> </span><br><span class="line">    glBegin(GL_POLYGON);</span><br><span class="line">    glVertex2f(-0.5f, 0.0f);</span><br><span class="line">    glVertex2f(0.5f, 0.0f);</span><br><span class="line">    glVertex2f(0.0f, 0.5f);</span><br><span class="line">    glEnd();</span><br><span class="line">    </span><br><span class="line">    glFlush();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc,const char *argv[]) &#123;</span><br><span class="line">    </span><br><span class="line">    glutInit(&amp;argc, (char **)argv);</span><br><span class="line">    glutCreateWindow(&quot;OpenGL环境搭建--显示三角形&quot;);</span><br><span class="line">    glutDisplayFunc(draw);</span><br><span class="line">    glutMainLoop();</span><br><span class="line">    </span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<blockquote>
+<p><strong>7、运行程序</strong></p>
+</blockquote>
+<ul>
+<li>如果没有问题的话你应该看到如下图案，至此我们的OpenGL搭建工作也告一段落</li>
+<li><img src="https://upload-images.jianshu.io/upload_images/590107-0632d0f5f149a965.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="运行结果"></li>
+</ul>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
       <h1 class="post-title"><a class="post-link" href="/posts/14ba70d9/">ARM64汇编小知识</a>
         </h1>
 
@@ -913,51 +978,6 @@
 </ul>
 </li>
 </ul>
-
-        </div></article>
-      <article class="post">
-    <header class="post-header">
-      <h1 class="post-title"><a class="post-link" href="/posts/da9fb1fe/">iOS中CoreAnimation的确认哪个动画结束(animationDidStop)</a>
-        </h1>
-
-      <div class="post-meta">
-        <span class="post-time">
-          2017-03-13
-        </span></div>
-    </header>
-
-    <div class="post-content"><p>在CoreAnimation中我们可以通过CAAnimation对象的delegate方法 <code>- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag</code>来完成动画结束后的一些操作,但是有时候会出现点问题,比如多个CAAnimation对象的delegate为同一个对象,这样就要区分是哪一个CAAnimation对象,我们可以通过<code>[xxx.layer animationForKey:@&quot;key&quot;]</code>来获取到一个CAAnimation对象,然后与<code>- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag</code>方法中的<code>anim </code>来比较,但是有时候总是不对,这是就要添加如下代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yourAnimtion.removedOnCompletion &#x3D; NO;</span><br></pre></td></tr></table></figure>
-<p>这样就可以通过<code>[xxx.layer animationForKey:@&quot;key&quot;];</code>查找到对应key的animation,接下来就可以接着添加你所需的该动画结束后的操作</p>
-<ul>
-<li>注意上面的方法是 <code>animationForKey :</code></li>
-</ul>
-<p>解决了上面的问题,不过一个循环引用的问题已可能悄悄发生了……</p>
-<p>如果我们给这段动画设置了:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yourAnimtion.delegate &#x3D; self;  </span><br></pre></td></tr></table></figure>
-<p>同时又让动画结束后不移除:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yourAnimtion.removedOnCompletion &#x3D; NO;</span><br></pre></td></tr></table></figure>
-
-<p>于是……<br>self持有yourView –&gt; yourView持有yourView.layer –&gt; yourView.layer持有yourAnimtion，yourAnimtion又持有self   ==&gt;  <code>循环引用</code></p>
-<p>那么为什么yourAnimtion会持有self 呢?</p>
-<p>是因为</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yourAnimtion.delegate &#x3D; self;  </span><br></pre></td></tr></table></figure>
-
-<p>你肯定会想,delegate不会强引用self的,但是错了….请看下面的官方代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;* The delegate of the animation. This object is retained for the</span><br><span class="line"> * lifetime of the animation object. Defaults to nil. See below for the</span><br><span class="line"> * supported delegate methods. *&#x2F;</span><br><span class="line"></span><br><span class="line">@property(nullable, strong) id &lt;CAAnimationDelegate&gt; delegate;</span><br></pre></td></tr></table></figure>
-
-<p>上面用的  <code>strong </code>   有木有……</p>
-<p>解决循环引用的问题</p>
-<p>在动画结束的delegate方法中:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[yourView.layer removeAllAnimations];</span><br></pre></td></tr></table></figure>
-
-<p>或者:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[yourView.layer removeAnimationForKey:yourKey];</span><br></pre></td></tr></table></figure>
-
-
-
-
-
 
         </div></article>
       <nav class="pagination"><a class="prev" href="/">
