@@ -1,0 +1,27 @@
+name: deploy
+
+on:
+  push:
+   branches:
+    - hexo
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@master
+        with:
+          ref: hexo
+      - name: Use Node.js 10.x
+        uses: actions/setup-node@master
+        with:
+          node-version: '10.x'
+      - name: Run hexo deploy
+        env:
+          ACTION_DEPLOY_KEY: ${{secrets.HEXO_DEPLOY_PRI}}
+        run: |
+          git config user.name "YotrolZ" 
+          git config user.email "674317983@qq.com"
+          sed -i "s/<token>/${ACTION_DEPLOY_KEY}/g" ./_config.yml
+          hexo deploy
