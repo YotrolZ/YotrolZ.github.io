@@ -17,11 +17,21 @@ jobs:
         uses: actions/setup-node@master
         with:
           node-version: '10.x'
-      - name: Run hexo deploy
+      - name: Setup Hexo Dependencies
+        run: |
+          npm i -g hexo-cli
+          npm install
+      - name: Setup Deploy Private Key
         env:
-          ACTION_DEPLOY_KEY: ${{secrets.HEXO_DEPLOY_PRI}}
+          HEXO_DEPLOY_PRI: ${{secrets.HEXO_DEPLOY_PRI}}
+        run: |
+          sed -i "s/<token>/${HEXO_DEPLOY_PRI}/g" ./_config.yml
+      - name: Config Git Infomation
         run: |
           git config user.name "YotrolZ" 
           git config user.email "674317983@qq.com"
-          sed -i "s/<token>/${ACTION_DEPLOY_KEY}/g" ./_config.yml
+      - name: Deploy Hexo
+        run: |
+          hexo clean
+          hexo generate 
           hexo deploy
