@@ -110,5 +110,5 @@ theme: even
 deploy:
   type: git
   repo: 
-    github: https://<token>@github.com:YotrolZ/YotrolZ.github.io.git
+    github: https://<token>@github.com/YotrolZ/YotrolZ.github.io.git
   branch: master
