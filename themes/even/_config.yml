@@ -125,6 +125,15 @@ utterances:
   theme: github-light # Theme: github-light | github-dark | github-dark-orange | icy-dark | dark-blue | photon-dark
   label: utterances # Issue label
 
+# 自己加的一些配置(原主题没有)
+# CDN
+cdn:
+  jsdelivr:
+    enabled: true
+    # 针对使用Github page搭建的博客
+    baseURL: https://cdn.jsdelivr.net/gh/yotrolz/yotrolz.github.io@master
+
+
 # ===========================================
 # Version
 # ===========================================

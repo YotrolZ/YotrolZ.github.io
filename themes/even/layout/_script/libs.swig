@@ -13,6 +13,10 @@
 
 {%- for lib in js_libs -%}
   {%- if lib -%}
-    <script type="text/javascript" src="{{ url_for('lib') }}/{{ lib }}"></script>
+    {%- if config.cdn === 'true' and config.cdn.baseURL -%}
+      <script type="text/javascript" src="{{ config.cdn.baseURL }}/lib/{{ lib }}"></script>
+    {%- else -%}
+      <script type="text/javascript" src="{{ url_for('lib') }}/{{ lib }}"></script>
+    {%- endif -%}
   {%- endif -%}
 {%- endfor -%}
