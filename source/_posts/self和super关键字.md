@@ -26,7 +26,7 @@ super:ViewController
 
 <!-- more -->
 
-> 分析
+## 分析
 
 ```shell
 xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc ViewController.m -o ViewController.cpp
@@ -57,7 +57,8 @@ NSStringFromClass(
 
 看一下`objc_msgSend`的定义：
 
-## [objc_msgSend](https://developer.apple.com/documentation/objectivec/1456712-objc_msgsend)
+## objc_msgSend
+- [官方文档](https://developer.apple.com/documentation/objectivec/1456712-objc_msgsend)
 - Sends a message with a simple return value to an instance of a class.
 - Declaration
   ```objc
@@ -89,7 +90,8 @@ NSStringFromClass(
   ```
 
 
-## [objc_msgSendSuper](https://developer.apple.com/documentation/objectivec/1456716-objc_msgsendsuper)
+## objc_msgSendSuper
+- [官方文档](https://developer.apple.com/documentation/objectivec/1456716-objc_msgsendsuper)
 - Sends a message with a simple return value to the superclass of an instance of a class.
 - Declaration
   ```objc
@@ -150,7 +152,7 @@ NSStringFromClass(
 
 区别：
 
-`[self class]` 从`当前类`开始找`class`方法
+`[self class]` 从 `当前类` 开始找 `class` 方法
 
-`[super class]` 从`当前类的父类`开始找`class`方法
+`[super class]` 从 `当前类的父类` 开始找 `class` 方法
 
