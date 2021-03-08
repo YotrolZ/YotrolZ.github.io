@@ -34,6 +34,8 @@ jobs:
           git config --global user.name "YotrolZ" 
           git config --global user.email "674317983@qq.com"
       - name: Deploy Hexo
+        env:
+          TZ: Asia/Shanghai
         run: |
           hexo clean
           hexo generate 
