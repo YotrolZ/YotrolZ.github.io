@@ -150,7 +150,7 @@ NSStringFromClass(
 
 区别：
 
-`[self class]` 从当前类开始找`class`方法
+`[self class]` 从`当前类`开始找`class`方法
 
-`[super class]` 从当前累的父类开始找`class`方法
+`[super class]` 从`当前类的父类`开始找`class`方法
 
