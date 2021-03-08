@@ -364,13 +364,14 @@ _main(const macho_header* mainExecutableMH, uintptr_t mainExecutableSlide,
 
 ```
 
-- 设置上下文等信息
-- 检查环境变量
-- 加载 shared cache
-- 将dyld本身添加到UUID列表
-- 实例化主程序
-- 链接主程序
-- 链接 inserted libraries
-- 运行所有初始化程序
-- 通知一些监视进程该进程将要进入main()
-- 查找主程序的入口
+- 设置上下文等信息 `setContext()`
+- 检查环境变量 `checkEnvironmentVariables()`
+- 加载共享缓存 `mapSharedCache()`
+- 将dyld本身添加到UUID列表 `addDyldImageToUUIDList()`
+- 实例化主程序 ImageLoader `instantiateFromLoadedImage`
+- 主程序签名相关 `hasCodeSignatureLoadCommand`
+- 链接主程序 `link()`
+- 链接 inserted libraries `link()`
+- 运行所有初始化程序 `initializeMainExecutable()`
+- 通知一些监视进程该进程将要进入main() `notifyMonitoringDyldMain()`
+- 查找主程序的入口 `getEntryFromLC_MAIN()`
