@@ -106,6 +106,14 @@ ignore:
 ## Themes: https://hexo.io/themes/
 theme: even
 
+# 自己加的一些配置(原主题没有)
+# CDN
+cdn:
+  jsdelivr:
+    enable: true
+    # 针对使用Github page搭建的博客
+    baseURL: https://cdn.jsdelivr.net/gh/yotrolz/yotrolz.github.io@master
+
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
