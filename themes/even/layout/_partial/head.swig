@@ -20,8 +20,8 @@
 
 {#- Fancybox styling -#}
 {%- if theme.fancybox -%}
-  {%- if config.cdn === 'true' and config.cdn.baseURL -%}
-    <link rel="stylesheet" type="text/css" href="{{ config.cdn.baseURL }}/lib/fancybox/jquery.fancybox.css" />
+  {%- if config.cdn and config.cdn.jsdelivr and config.cdn.jsdelivr.enable and config.cdn.jsdelivr.baseURL -%}
+    <link rel="stylesheet" type="text/css" href="{{ config.cdn.jsdelivr.baseURL }}/lib/fancybox/jquery.fancybox.css" />
   {%- else -%}
     <link rel="stylesheet" type="text/css" href="{{ url_for('lib/fancybox/jquery.fancybox.css') }}" />
   {%- endif -%}
@@ -36,8 +36,8 @@
 {%- endif -%}
 
 {#- Theme styling -#}
-{%- if config.cdn === 'true' and config.cdn.baseURL -%}
-  <link rel="stylesheet" type="text/css" href="{{ config.cdn.baseURL }}/css/style.css?v={{ theme.version }}" />
+{%- if config.cdn and config.cdn.jsdelivr and config.cdn.jsdelivr.enable and config.cdn.jsdelivr.baseURL -%}
+  <link rel="stylesheet" type="text/css" href="{{ config.cdn.jsdelivr.baseURL }}/css/style.css?v={{ theme.version }}" />
 {%- else -%}
   <link rel="stylesheet" type="text/css" href="{{ url_for('css/style.css') }}?v={{ theme.version }}" />
 {%- endif -%}
