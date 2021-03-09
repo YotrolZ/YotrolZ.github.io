@@ -41,16 +41,17 @@ Total pre-main time: 644.58 milliseconds (100.0%)
 说起`DYLD_PRINT_STATISTICS`环境变量，那就一定要说起`程序的启动过程`，在程序启动过程中(这里特指main()函数之前)，就涉及到了`dyld 的加载流程`,大致流程如下：具体可以阅读 `dyld 源码`:位于 https://opensource.apple.com/tarballs/dyld/ 或者也可以参考下之前的文章
 
 ```
-- 设置上下文等信息
-- 检查环境变量
-- 加载 shared cache
-- 将dyld本身添加到UUID列表
-- 实例化主程序
-- 链接主程序
-- 链接 inserted libraries
-- 运行所有初始化程序(initializeMainExecutable)
-- 通知一些监视进程该进程将要进入main()
-- 查找主程序的入口
+- 设置上下文等信息 setContext()
+- 检查环境变量 checkEnvironmentVariables()
+- 加载共享缓存 mapSharedCache()
+- 将dyld本身添加到UUID列表 addDyldImageToUUIDList()
+- 实例化主程序 ImageLoader instantiateFromLoadedImage
+- 主程序签名相关 hasCodeSignatureLoadCommand
+- 链接主程序 link()
+- 链接 inserted libraries link()
+- 运行所有初始化程序 initializeMainExecutable()
+- 通知一些监视进程该进程将要进入main() notifyMonitoringDyldMain()
+- 查找主程序的入口 getEntryFromLC_MAIN()
 ```
 
 ### initializeMainExecutable()
@@ -104,13 +105,13 @@ void ImageLoader::printStatistics(unsigned int imageCount, const InitializerTimi
     printTime("           initializer time", fgTotalInitTime-fgTotalObjCSetupTime, totalDyldTime);
     dyld::log("           slowest intializers :\n");
     for (uintptr_t i=0; i < timingInfo.count; ++i) {
-      uint64_t t = timingInfo.images[i].initTime;
-      if ( t*50 < totalDyldTime )
-        continue;
-      dyld::log("%30s ", timingInfo.images[i].shortName);
-      if ( strncmp(timingInfo.images[i].shortName, "libSystem.", 10) == 0 )
-        t -= fgTotalObjCSetupTime;
-        printTime("", t, totalDyldTime);
+        uint64_t t = timingInfo.images[i].initTime;
+        if ( t*50 < totalDyldTime )
+            continue;
+        dyld::log("%30s ", timingInfo.images[i].shortName);
+        if ( strncmp(timingInfo.images[i].shortName, "libSystem.", 10) == 0 )
+            t -= fgTotalObjCSetupTime;
+            printTime("", t, totalDyldTime);
     }
     dyld::log("\n");
 }
