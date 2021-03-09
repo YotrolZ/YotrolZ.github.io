@@ -40,6 +40,8 @@ void initializeMainExecutable()
 }
 ```
 
+<!-- more -->
+
 ## ImageLoader::runInitializers
 
 ```c++
