@@ -76,7 +76,7 @@ int main(int argc, char * argv[]) {
 
 ## dyld 简介
 
-- dyld(The dynamic link editor)动态链接编辑器，是操作系统的重要组成部分，在 macOS 系统中，dyld 位于 `Macintosh HD/usr/lib/dyld`。 
+- `dyld(The Dynamic Linker/Loader)`动态链接(加载)器，是操作系统的重要组成部分，在 macOS 系统中，dyld 位于 `Macintosh HD/usr/lib/dyld`。 
 
 - dyld 源码是开源的，位于 https://opensource.apple.com/tarballs/dyld/
 
@@ -130,7 +130,6 @@ __dyld_start:
 位于 命名空间 `namespace dyldbootstrap` 下的 start 方法
 
 ```c++
-
 //
 //  This is code to bootstrap dyld.  This work in normally done for a program by dyld and crt.
 //  In dyld we have to do this manually.
@@ -180,176 +179,275 @@ _main(const macho_header* mainExecutableMH, uintptr_t mainExecutableSlide,
 		int argc, const char* argv[], const char* envp[], const char* apple[], 
 		uintptr_t* startGlue)
 {
-	......
+    ......
 
-	uintptr_t result = 0;
-	sMainExecutableMachHeader = mainExecutableMH;
-	sMainExecutableSlide = mainExecutableSlide;
+    uintptr_t result = 0;
+    sMainExecutableMachHeader = mainExecutableMH;
+    sMainExecutableSlide = mainExecutableSlide;
 
-	......
+    ......
 
-	CRSetCrashLogMessage("dyld: launch started");
+    CRSetCrashLogMessage("dyld: launch started");
 
-	// 设置上下文等信息
-	setContext(mainExecutableMH, argc, argv, envp, apple);
+    // 设置上下文等信息
+    setContext(mainExecutableMH, argc, argv, envp, apple);
 
+    ......
 
-	......
+    // 检查环境变量
+    checkEnvironmentVariables(envp);
+    defaultUninitializedFallbackPaths(envp);
+    // 根据环境变量进行打印输出
+    if ( sEnv.DYLD_PRINT_OPTS )
+      printOptions(argv);
+    if ( sEnv.DYLD_PRINT_ENV ) 
+      printEnvironmentVariables(envp);
 
+    ......
 
-	// 检查环境变量
-	checkEnvironmentVariables(envp);
-	defaultUninitializedFallbackPaths(envp);
-	// 根据环境变量进行打印输出
-	if ( sEnv.DYLD_PRINT_OPTS )
-		printOptions(argv);
-	if ( sEnv.DYLD_PRINT_ENV ) 
-		printEnvironmentVariables(envp);
+    // 加载 shared cache
+    // load shared cache
+    checkSharedRegionDisable((dyld3::MachOLoaded*)mainExecutableMH, mainExecutableSlide);
+    if ( gLinkContext.sharedRegionMode != ImageLoader::kDontUseSharedRegion ) {
+      mapSharedCache();
+    }
 
-	......
+    // 主要用于判别 dyld2 还是 dyld3
+    // If we haven't got a closure mode yet, then check the environment and cache type
+    if ( sClosureMode == ClosureMode::Unset ) {
+        // First test to see if we forced in dyld2 via a kernel boot-arg
+        if ( dyld3::BootArgs::forceDyld2() ) {
+            sClosureMode = ClosureMode::Off;
+        } else if ( inDenyList(sExecPath) ) {
+            sClosureMode = ClosureMode::Off;
+        } else if ( sEnv.hasOverride ) {
+            sClosureMode = ClosureMode::Off;
+        } else if ( dyld3::BootArgs::forceDyld3() ) {
+            sClosureMode = ClosureMode::On;
+        } else {
+            sClosureMode = getPlatformDefaultClosureMode();
+        }
+    }
 
-	// 加载 shared cache
-	// load shared cache
-	checkSharedRegionDisable((dyld3::MachOLoaded*)mainExecutableMH, mainExecutableSlide);
-	if ( gLinkContext.sharedRegionMode != ImageLoader::kDontUseSharedRegion ) {
-		mapSharedCache();
-	}
+#if !TARGET_OS_SIMULATOR
+    if ( sClosureMode == ClosureMode::Off ) {
+        if ( gLinkContext.verboseWarnings )
+          dyld::log("dyld: not using closure because of DYLD_USE_CLOSURES or -force_dyld2=1 override\n");
+    } else {
+        
+        ......
+        
+        // 关于 dyld3 closure 的部分
 
-	......
+        // 首先从 cache 中检查 closure
+        // check for closure in cache first
+        if ( sSharedCacheLoadInfo.loadAddress != nullptr ) {
+            mainClosure = sSharedCacheLoadInfo.loadAddress->findClosure(sExecPath);
+            if ( gLinkContext.verboseWarnings && (mainClosure != nullptr) )
+                dyld::log("dyld: found closure %p (size=%lu) in dyld shared cache\n", mainClosure, mainClosure->size());
+        }
 
-	// install gdb notifier
-	stateToHandlers(dyld_image_state_dependents_mapped, sBatchHandlers)->push_back(notifyGDB);
-	stateToHandlers(dyld_image_state_mapped, sSingleHandlers)->push_back(updateAllImages);
-	// make initial allocations large enough that it is unlikely to need to be re-alloced
-	sImageRoots.reserve(16);
-	sAddImageCallbacks.reserve(4);
-	sRemoveImageCallbacks.reserve(4);
-	sAddLoadImageCallbacks.reserve(4);
-	sImageFilesNeedingTermination.reserve(16);
-	sImageFilesNeedingDOFUnregistration.reserve(8);
+        // We only want to try build a closure at runtime if its an iOS third party binary, or a macOS binary from the shared cache
+        bool allowClosureRebuilds = false;
+        if ( sClosureMode == ClosureMode::On ) {
+          allowClosureRebuilds = true;
+        } else if ( (sClosureMode == ClosureMode::PreBuiltOnly) && (mainClosure != nullptr) ) {
+          allowClosureRebuilds = true;
+        }
 
+        if ( (mainClosure != nullptr) && !closureValid(mainClosure, mainFileInfo, mainExecutableCDHash, true, envp) )
+          mainClosure = nullptr;
 
-	try {
-		// 将dyld本身添加到UUID列表
-		// add dyld itself to UUID list
-		addDyldImageToUUIDList();
+        // 如果在cache中找不到有效的closure，我们就新建一个
+        // If we didn't find a valid cache closure then try build a new one
+        if ( (mainClosure == nullptr) && allowClosureRebuilds ) {
+            // 在cache中查找 closure
+            // if forcing closures, and no closure in cache, or it is invalid, check for cached closure
+            if ( !sForceInvalidSharedCacheClosureFormat )
+                mainClosure = findCachedLaunchClosure(mainExecutableCDHash, mainFileInfo, envp);
+            if ( mainClosure == nullptr ) {
+                // cache 中没有找到 --> 创建新的 closure
+                // if  no cached closure found, build new one
+                mainClosure = buildLaunchClosure(mainExecutableCDHash, mainFileInfo, envp);
+            }
+        }
 
-		......
+        // exit dyld after closure is built, without running program
+        if ( sJustBuildClosure )
+          _exit(EXIT_SUCCESS);
 
-		// 实例化主程序
-		// instantiate ImageLoader for main executable
-		sMainExecutable = instantiateFromLoadedImage(mainExecutableMH, mainExecutableSlide, sExecPath);
-		gLinkContext.mainExecutable = sMainExecutable;
-		gLinkContext.mainExecutableCodeSigned = hasCodeSignatureLoadCommand(mainExecutableMH);
+        // 尝试使用 launch closure
+        // try using launch closure
+        if ( mainClosure != nullptr ) {
+            CRSetCrashLogMessage("dyld3: launch started");
+            bool launched = launchWithClosure(mainClosure, sSharedCacheLoadInfo.loadAddress, (dyld3::MachOLoaded*)mainExecutableMH,
+                            mainExecutableSlide, argc, argv, envp, apple, &result, startGlue);
+            if ( !launched && allowClosureRebuilds ) {
 
-		......
+                /* 
+                * 如果closure已经过期，就新建一个
+                * buildLaunchClosure 内部会将新建的 closure 保存到硬盘，便于下一次能快速启动
+                * buildLaunchClosure 内部官方注释：try to atomically save closure to disk to speed up next launch
+                */
+                // closure is out of date, build new one
+                mainClosure = buildLaunchClosure(mainExecutableCDHash, mainFileInfo, envp);
+                if ( mainClosure != nullptr ) {
+                launched = launchWithClosure(mainClosure, sSharedCacheLoadInfo.loadAddress, (dyld3::MachOLoaded*)mainExecutableMH,
+                                mainExecutableSlide, argc, argv, envp, apple, &result, startGlue);
+                }
+            }
+            if ( launched ) {
+                gLinkContext.startedInitializingMainExecutable = true;
+        #if __has_feature(ptrauth_calls)
+                // start() calls the result pointer as a function pointer so we need to sign it.
+                result = (uintptr_t)__builtin_ptrauth_sign_unauthenticated((void*)result, 0, 0);
+        #endif
+                if (sSkipMain)
+                    result = (uintptr_t)&fake_main;
+                return result;
+            }
+            else {
+                if ( gLinkContext.verboseWarnings ) {
+                    dyld::log("dyld: unable to use closure %p\n", mainClosure);
+                }
+            }
+        }
+    }
+#endif // TARGET_OS_SIMULATOR
+	// could not use closure info, launch old way
 
-		// 加载 inserted libraries
-		// load any inserted libraries
-		if	( sEnv.DYLD_INSERT_LIBRARIES != NULL ) {
-			for (const char* const* lib = sEnv.DYLD_INSERT_LIBRARIES; *lib != NULL; ++lib) 
-				loadInsertedDylib(*lib);
-		}
-		// record count of inserted libraries so that a flat search will look at 
-		// inserted libraries, then main, then others.
-		sInsertedDylibCount = sAllImages.size()-1;
-		
-		// 链接主程序
-		// link main executable
-		gLinkContext.linkingMainExecutable = true;
-		link(sMainExecutable, sEnv.DYLD_BIND_AT_LAUNCH, true, ImageLoader::RPathChain(NULL, NULL), -1);
-		sMainExecutable->setNeverUnloadRecursive();
-		if ( sMainExecutable->forceFlat() ) {
-			gLinkContext.bindFlat = true;
-			gLinkContext.prebindUsage = ImageLoader::kUseNoPrebinding;
-		}
-    
-		// 链接 inserted libraries
-		// link any inserted libraries
-		// do this after linking main executable so that any dylibs pulled in by inserted 
-		// dylibs (e.g. libSystem) will not be in front of dylibs the program uses
-		if ( sInsertedDylibCount > 0 ) {
-			for(unsigned int i=0; i < sInsertedDylibCount; ++i) {
-				ImageLoader* image = sAllImages[i+1];
-				link(image, sEnv.DYLD_BIND_AT_LAUNCH, true, ImageLoader::RPathChain(NULL, NULL), -1);
-				image->setNeverUnloadRecursive();
-			}
-			if ( gLinkContext.allowInterposing ) {
-				// only INSERTED libraries can interpose
-				// register interposing info after all inserted libraries are bound so chaining works
-				for(unsigned int i=0; i < sInsertedDylibCount; ++i) {
-					ImageLoader* image = sAllImages[i+1];
-					image->registerInterposing(gLinkContext);
-				}
-			}
-		}
+    ......
 
-		if ( gLinkContext.allowInterposing ) {
-			// <rdar://problem/19315404> dyld should support interposition even without DYLD_INSERT_LIBRARIES
-			for (long i=sInsertedDylibCount+1; i < sAllImages.size(); ++i) {
-				ImageLoader* image = sAllImages[i];
-				if ( image->inSharedCache() )
-					continue;
-				image->registerInterposing(gLinkContext);
-			}
-		}
-	
-		......
+    // install gdb notifier
+    stateToHandlers(dyld_image_state_dependents_mapped, sBatchHandlers)->push_back(notifyGDB);
+    stateToHandlers(dyld_image_state_mapped, sSingleHandlers)->push_back(updateAllImages);
+    // make initial allocations large enough that it is unlikely to need to be re-alloced
+    sImageRoots.reserve(16);
+    sAddImageCallbacks.reserve(4);
+    sRemoveImageCallbacks.reserve(4);
+    sAddLoadImageCallbacks.reserve(4);
+    sImageFilesNeedingTermination.reserve(16);
+    sImageFilesNeedingDOFUnregistration.reserve(8);
 
-		// apply interposing to initial set of images
-		for(int i=0; i < sImageRoots.size(); ++i) {
-			sImageRoots[i]->applyInterposing(gLinkContext);
-		}
-		ImageLoader::applyInterposingToDyldCache(gLinkContext);
+    try {
+        // 将dyld本身添加到UUID列表
+        // add dyld itself to UUID list
+        addDyldImageToUUIDList();
 
-		// Bind and notify for the main executable now that interposing has been registered
-		uint64_t bindMainExecutableStartTime = mach_absolute_time();
-		sMainExecutable->recursiveBindWithAccounting(gLinkContext, sEnv.DYLD_BIND_AT_LAUNCH, true);
-		uint64_t bindMainExecutableEndTime = mach_absolute_time();
-		ImageLoaderMachO::fgTotalBindTime += bindMainExecutableEndTime - bindMainExecutableStartTime;
-		gLinkContext.notifyBatch(dyld_image_state_bound, false);
+        ......
 
-		// Bind and notify for the inserted images now interposing has been registered
-		if ( sInsertedDylibCount > 0 ) {
-			for(unsigned int i=0; i < sInsertedDylibCount; ++i) {
-				ImageLoader* image = sAllImages[i+1];
-				image->recursiveBind(gLinkContext, sEnv.DYLD_BIND_AT_LAUNCH, true);
-			}
-		}
-		
-		// <rdar://problem/12186933> do weak binding only after all inserted images linked
-		sMainExecutable->weakBind(gLinkContext);
-		gLinkContext.linkingMainExecutable = false;
+        // 实例化主程序ImageLoader
+        // instantiate ImageLoader for main executable
+        sMainExecutable = instantiateFromLoadedImage(mainExecutableMH, mainExecutableSlide, sExecPath);
+        gLinkContext.mainExecutable = sMainExecutable;
+        gLinkContext.mainExecutableCodeSigned = hasCodeSignatureLoadCommand(mainExecutableMH);
 
-		sMainExecutable->recursiveMakeDataReadOnly(gLinkContext);
+        ......
 
-		CRSetCrashLogMessage("dyld: launch, running initializers");
-		
-		// 运行所有初始化程序(🔔🔔🔔这个方法相当的重要❗️❗️❗️)
-		// run all initializers
-		initializeMainExecutable();
+        // 加载 inserted libraries
+        // load any inserted libraries
+        if ( sEnv.DYLD_INSERT_LIBRARIES != NULL ) {
+            for (const char* const* lib = sEnv.DYLD_INSERT_LIBRARIES; *lib != NULL; ++lib) 
+                loadInsertedDylib(*lib);
+        }
+        // record count of inserted libraries so that a flat search will look at 
+        // inserted libraries, then main, then others.
+        sInsertedDylibCount = sAllImages.size()-1;
+        
+        // 链接主程序
+        // link main executable
+        gLinkContext.linkingMainExecutable = true;
+        link(sMainExecutable, sEnv.DYLD_BIND_AT_LAUNCH, true, ImageLoader::RPathChain(NULL, NULL), -1);
+        sMainExecutable->setNeverUnloadRecursive();
+        if ( sMainExecutable->forceFlat() ) {
+            gLinkContext.bindFlat = true;
+            gLinkContext.prebindUsage = ImageLoader::kUseNoPrebinding;
+        }
 
-		// 通知一些监视进程该进程将要进入main()
-		// notify any montoring proccesses that this process is about to enter main()
-		notifyMonitoringDyldMain();
+        // 链接 inserted libraries
+        // link any inserted libraries
+        // do this after linking main executable so that any dylibs pulled in by inserted 
+        // dylibs (e.g. libSystem) will not be in front of dylibs the program uses
+        if ( sInsertedDylibCount > 0 ) {
+            for(unsigned int i=0; i < sInsertedDylibCount; ++i) {
+                ImageLoader* image = sAllImages[i+1];
+                link(image, sEnv.DYLD_BIND_AT_LAUNCH, true, ImageLoader::RPathChain(NULL, NULL), -1);
+                image->setNeverUnloadRecursive();
+            }
+            if ( gLinkContext.allowInterposing ) {
+                // only INSERTED libraries can interpose
+                // register interposing info after all inserted libraries are bound so chaining works
+                for(unsigned int i=0; i < sInsertedDylibCount; ++i) {
+                    ImageLoader* image = sAllImages[i+1];
+                    image->registerInterposing(gLinkContext);
+                }
+            }
+        }
 
-		{
-			// 查找主程序的入口
-			// find entry point for main executable
-			result = (uintptr_t)sMainExecutable->getEntryFromLC_MAIN();
-			if ( result != 0 ) {
-				// main executable uses LC_MAIN, we need to use helper in libdyld to call into main()
-				if ( (gLibSystemHelpers != NULL) && (gLibSystemHelpers->version >= 9) )
-					*startGlue = (uintptr_t)gLibSystemHelpers->startGlueToCallExit;
-				else
-					halt("libdyld.dylib support not present for LC_MAIN");
-			}
-			else {
-				// main executable uses LC_UNIXTHREAD, dyld needs to let "start" in program set up for main()
-				result = (uintptr_t)sMainExecutable->getEntryFromLC_UNIXTHREAD();
-				*startGlue = 0;
-			}
-		}
+        if ( gLinkContext.allowInterposing ) {
+            // <rdar://problem/19315404> dyld should support interposition even without DYLD_INSERT_LIBRARIES
+            for (long i=sInsertedDylibCount+1; i < sAllImages.size(); ++i) {
+                ImageLoader* image = sAllImages[i];
+                if ( image->inSharedCache() )
+                    continue;
+                image->registerInterposing(gLinkContext);
+            }
+        }
+
+        ......
+
+        // apply interposing to initial set of images
+        for(int i=0; i < sImageRoots.size(); ++i) {
+            sImageRoots[i]->applyInterposing(gLinkContext);
+        }
+        ImageLoader::applyInterposingToDyldCache(gLinkContext);
+
+        // Bind and notify for the main executable now that interposing has been registered
+        uint64_t bindMainExecutableStartTime = mach_absolute_time();
+        sMainExecutable->recursiveBindWithAccounting(gLinkContext, sEnv.DYLD_BIND_AT_LAUNCH, true);
+        uint64_t bindMainExecutableEndTime = mach_absolute_time();
+        ImageLoaderMachO::fgTotalBindTime += bindMainExecutableEndTime - bindMainExecutableStartTime;
+        gLinkContext.notifyBatch(dyld_image_state_bound, false);
+
+        // Bind and notify for the inserted images now interposing has been registered
+        if ( sInsertedDylibCount > 0 ) {
+            for(unsigned int i=0; i < sInsertedDylibCount; ++i) {
+                ImageLoader* image = sAllImages[i+1];
+                image->recursiveBind(gLinkContext, sEnv.DYLD_BIND_AT_LAUNCH, true);
+            }
+        }
+        
+        // <rdar://problem/12186933> do weak binding only after all inserted images linked
+        sMainExecutable->weakBind(gLinkContext);
+        gLinkContext.linkingMainExecutable = false;
+
+        sMainExecutable->recursiveMakeDataReadOnly(gLinkContext);
+
+        CRSetCrashLogMessage("dyld: launch, running initializers");
+        
+        // 运行所有初始化程序(🔔🔔🔔这个方法相当的重要❗️❗️❗️)
+        // run all initializers
+        initializeMainExecutable();
+
+        // 通知一些监视进程该进程将要进入main()
+        // notify any montoring proccesses that this process is about to enter main()
+        notifyMonitoringDyldMain();
+
+        // 查找主程序的入口
+        // find entry point for main executable
+        result = (uintptr_t)sMainExecutable->getEntryFromLC_MAIN();
+        if ( result != 0 ) {
+            // main executable uses LC_MAIN, we need to use helper in libdyld to call into main()
+            if ( (gLibSystemHelpers != NULL) && (gLibSystemHelpers->version >= 9) )
+                *startGlue = (uintptr_t)gLibSystemHelpers->startGlueToCallExit;
+            else
+                halt("libdyld.dylib support not present for LC_MAIN");
+        }
+        else {
+            // main executable uses LC_UNIXTHREAD, dyld needs to let "start" in program set up for main()
+            result = (uintptr_t)sMainExecutable->getEntryFromLC_UNIXTHREAD();
+            *startGlue = 0;
+        }
 	}
 	catch(const char* message) {
 		syncAllImages();
