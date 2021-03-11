@@ -15,6 +15,8 @@ https://jenkins.io/index.html
 open /Applications/Jenkins/jenkins.war
 ```
 
+<!-- more -->
+
 - 方式二：使用homebrew
   1. 安装 homebrew（如果已经安装，跳过此步）
     ```

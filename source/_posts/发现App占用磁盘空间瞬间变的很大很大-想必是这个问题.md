@@ -9,6 +9,7 @@ tags:
 于是乎做了如下验证,将`Mallo Stack`取消打钩,重装App,用pp助手检测该App占用磁盘空间,发现在`tmp`下并没有发现之前的那个文件`stack-logs.xxxxx.index`,磁盘占用量也处于稳定状态(1~2M),并没有出现暴涨的情况,看来真是这个东西在做鬼.
 为了更加认定是这个`Malloc Stack`在做鬼,于是又将`Mallo Stack`打钩,问题又出现了,刚装App,用PP助手立即查看App磁盘占用,瞬间已经暴涨到了`80+M`,哎呀我的小心脏,查看文件结构后发现,又是`tmp`下的`stack-logs.xxxxx.index`在做鬼,上图留念一下:
 
+<!-- more -->
 
 ![App沙盒目录](http://upload-images.jianshu.io/upload_images/590107-03e73a7087fd90f1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 

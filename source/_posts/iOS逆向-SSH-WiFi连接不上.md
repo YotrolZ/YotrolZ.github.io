@@ -13,6 +13,8 @@ tags:
 - 注:一般越狱机的系统在iOS 10以上会出现SSH WiFi链接不上的问题
 - iOS 10的越狱环境已经自带了SSH,我们不需要安装 open SSH 了,直接去Cydia里面卸载!
 
+<!-- more -->
+
 -下面开始操作:
   - 1.先用USB链接越狱设备,可以通过PP助手进入`/private/var/containers/Bundle/Application/xxxxx-xxxxx-xxxxx/yalu102.app/`,这里的`xxxxxxx-xxxxxx-xxxxx`一般是一堆数字,最笨的方法就是挨个点击进入看看有否有`yalu102.app`,找到后我们进行下一步;
 ![yalu102目录](http://upload-images.jianshu.io/upload_images/590107-87a2f706c9d5fd14.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)

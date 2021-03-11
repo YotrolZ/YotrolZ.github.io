@@ -11,6 +11,8 @@ tags:
 
 - 滤镜处理的过程比较慢,会造成加载图片缓慢的现象(等一会才看到图片),尽量放到子线程执行
 
+<!-- more -->
+
 ```objc
 - (void)viewDidLoad {
     [super viewDidLoad];

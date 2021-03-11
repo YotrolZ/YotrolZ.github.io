@@ -11,6 +11,8 @@ tags:
 - 效果如图：
 ![example](https://upload-images.jianshu.io/upload_images/590107-976fffd316e98cb3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+<!-- more -->
+
 - 使用方式：
 - Installation with CocoaPods：
     - `pod 'YCShadowView'`

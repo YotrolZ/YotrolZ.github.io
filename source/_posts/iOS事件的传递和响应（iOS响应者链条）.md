@@ -9,6 +9,7 @@ tags:
 - iOS中的时间可以分为3大类型:
 ![iOS中的事件类型](http://upload-images.jianshu.io/upload_images/590107-eb0c16adb01319a4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+<!-- more -->
 
 #### 一 . 响应者对象
    - 在iOS中不是任何对象都能处理事件，只有继承了`UIResponder`的对象才能接收并处理事件。我们称之为`响应者对象`

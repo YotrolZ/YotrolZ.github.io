@@ -15,6 +15,8 @@ tags:
 - **抽象产品**：定义简单工厂中要返回的产品；用`抽象类`表示，由于OC中无抽象类的概念，可以使用`协议（Protocol）`来表示；
 - **具体产品**：具体生产的产品。是抽象产品的子类(继承自抽象类)，在OC中就是遵守上述`协议（Protocol）`。
 
+<!-- more -->
+
 > **3、简单工厂模式类图**
 
 - ![简单工厂模式](http://upload-images.jianshu.io/upload_images/590107-be044ef4d46c361d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)

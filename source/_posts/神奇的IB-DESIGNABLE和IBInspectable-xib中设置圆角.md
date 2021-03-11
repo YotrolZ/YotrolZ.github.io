@@ -13,6 +13,8 @@ tags:
 ![设置Key Paht](http://upload-images.jianshu.io/upload_images/590107-9b78c886c474176c.png?imageMogr2/auto-orient/strip|imageView2/2/w/1240)
    - 3.设置圆形图片的话,还可以画一个圆形图片,详情可以移步[这里](http://www.jianshu.com/p/068d6f493547);
 
+<!-- more -->
+
 - 下面以在xib中设置圆角为例,说明`IB_DESIGNABLE`和`IBInspectable`的神奇之处:
 
 <!-- more -->

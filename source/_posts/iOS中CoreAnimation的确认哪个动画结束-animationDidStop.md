@@ -14,6 +14,8 @@ yourAnimtion.removedOnCompletion = NO;
 
 - 注意上面的方法是 `animationForKey :`
 
+<!-- more -->
+
 解决了上面的问题,不过一个循环引用的问题已可能悄悄发生了......
 
 如果我们给这段动画设置了:

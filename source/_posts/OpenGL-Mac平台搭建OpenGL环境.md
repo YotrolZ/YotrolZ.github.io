@@ -8,6 +8,9 @@ tags:
 
 > **1、创建一个Mac应用工程**
 - 打开Xcode --> Creat a new Xcode project -->  macOS --> Cocoa App
+
+<!-- more -->
+
 - ![新建一个Mac应用程序](https://upload-images.jianshu.io/upload_images/590107-f8f60fb967683126.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 > **2、添加系统库**

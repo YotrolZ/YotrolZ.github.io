@@ -20,6 +20,8 @@ tags:
 
 - 4.只有一个UIWindow也可以显示
 
+<!-- more -->
+
 ![只有UIWindow的情况](http://upload-images.jianshu.io/upload_images/590107-50aa2d50410d9617.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 - 5.给UIWindow添加一个view---`不能用该做法`

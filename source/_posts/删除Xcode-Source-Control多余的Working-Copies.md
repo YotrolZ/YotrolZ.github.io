@@ -10,6 +10,8 @@ tags:
 
 ![Working Copies](http://upload-images.jianshu.io/upload_images/590107-be6158dd2ee39871.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+<!-- more -->
+
 这个其实并不影响开发,但是对于强迫症的人来说也格外不爽,比如:(为了方便观看,将文件目录收缩了)
 ![提交代码](http://upload-images.jianshu.io/upload_images/590107-6bb1c110d0fb14bb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 

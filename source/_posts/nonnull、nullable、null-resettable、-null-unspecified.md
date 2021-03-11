@@ -16,6 +16,8 @@ tags:
 ```
 ![nonnull三种用法](http://upload-images.jianshu.io/upload_images/590107-92c4b5de1d6b1c4a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+<!-- more -->
+
 > nullable : 可以为空
 
 - 使用方法:

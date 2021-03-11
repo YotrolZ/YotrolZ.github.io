@@ -12,6 +12,8 @@ tags:
 > **2、单例模式UML类图**
 - ![单例模式](http://upload-images.jianshu.io/upload_images/590107-c019777dc26e8a1a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+<!-- more -->
+
 > **3、单例模式示意代码**
 -  **`SingletonA`**
 ```
