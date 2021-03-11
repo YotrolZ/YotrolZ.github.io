@@ -6,6 +6,22 @@ tags:
 
 
 ## \_\_LP64\_\_
+```c++
+/// https://github.com/llvm/llvm-project/
+if (TI.getPointerWidth(0) == 64 && TI.getLongWidth() == 64
+      && TI.getIntWidth() == 32) {
+    Builder.defineMacro("_LP64");
+    Builder.defineMacro("__LP64__");
+}
+
+if (TI.getPointerWidth(0) == 32 && TI.getLongWidth() == 32
+    && TI.getIntWidth() == 32) {
+    Builder.defineMacro("_ILP32");
+    Builder.defineMacro("__ILP32__");
+}
+```
+
+<!-- more -->
 
 ```c++
 // Target properties.
@@ -15,12 +31,19 @@ if (!getTriple().isOSWindows() && getTriple().isArch64Bit()) {
 }
 ```
 
-<!-- more -->
+- 这里可能会有一点疑惑：为什么`isArch64Bit` 就认为是`__LP64__`?
+```c++
+bool Triple::isArch64Bit() const {
+    // 大概意思应该是：获取 pointer 占用的 bit 数
+    // 接着看下文中对 LP64 的说明
+    return getArchPointerBitWidth(getArch()) == 64;
+}
+```
 
 - `LP64` 其实就是 `long integers` 和 `pointers` 是 `64 bits`
 - 除了 `LP64` 之外，还有 `LLP64`、`ILP64`、`SILP64`
 
-- **值得注意的是：** 也有在`64位处理器`上使用`ILP32`数据模型，该模型减小了代码大小，并减小了包含指针的数据结构的大小，但代价是地址空间会小很多，对于某些嵌入式系统来说，`ILP32` 是一个不错的选择。已在`Apple Watch Series 4 / 5`中使用
+- **值得注意的是：** 也有在`64位处理器`上使用`ILP32`数据模型，该数据模型减小了代码大小，并减小了包含指针的数据结构的大小，所以造成的结果就是地址空间会小很多。对于某些嵌入式系统来说，`ILP32` 是一个不错的选择。已在`Apple Watch Series 4 / 5`中使用。
 
 <table>
     <th colspan="6">data models</th>
