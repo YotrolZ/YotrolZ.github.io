@@ -15,14 +15,15 @@ if (!getTriple().isOSWindows() && getTriple().isArch64Bit()) {
 }
 ```
 
+<!-- more -->
+
 - `LP64` 其实就是 `long integers` 和 `pointers` 是 `64 bits`
 - 除了 `LP64` 之外，还有 `LLP64`、`ILP64`、`SILP64`
 
 - **值得注意的是：** 也有在`64位处理器`上使用`ILP32`数据模型，该模型减小了代码大小，并减小了包含指针的数据结构的大小，但代价是地址空间会小很多，对于某些嵌入式系统来说，`ILP32` 是一个不错的选择。已在`Apple Watch Series 4 / 5`中使用
 
-
 <table>
-    <th colspan="6">64-bit data models</th>
+    <th colspan="6">data models</th>
 	<tr>
 		<th>Data model
 		</td>
