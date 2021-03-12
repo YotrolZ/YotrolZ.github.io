@@ -28,9 +28,17 @@
     .toc {
       margin: 10px 0;
       padding-left: 20px;
+      font-weight: 600;
+      list-style: disc;
 
       .toc-child {
         padding-left: 15px;
+        font-weight: 400;
+        list-style: circle;
+      }
+
+      .toc-item {
+        padding: 2px 0;
       }
     }
 
