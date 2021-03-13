@@ -185,7 +185,9 @@ union isa_t {
 
 - `#   define SUPPORT_INDEXED_ISA 1` 主要针对 watchOS
 - 在 `iOS` 中 `#   define SUPPORT_INDEXED_ISA 0`
-- **注意点**: `__arm64__` 未必就一定使用 `LP64` 数据模型（可以回看文章首部关不`LP64`的说明）
+- **注意点**: 
+    - `__arm64__` 代表的是CPU架构
+    - `LP64` 代表的采用哪种数据模型（可以回看文章首部关不`LP64`的说明）
 
 ```c++
 // Define SUPPORT_INDEXED_ISA=1 on platforms that store the class in the isa 
