@@ -164,7 +164,7 @@
     }
 
     function addCounter(Counter) {
-      var query = new AV.Query(Counter);
+      var query = new AV.Query('Counter');
 
       var url = $visits.data('url').trim();
       var title = $visits.data('title').trim();
