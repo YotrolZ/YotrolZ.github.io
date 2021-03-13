@@ -75,6 +75,7 @@ social:
 
 # LeanCloud
 leancloud:
+  show_visits: false
   app_id: mqfPQEKBtui9puAJUkYFY7Jn-MdYXbMMI
   app_key: A6R0T4bEvcBsTU8pB7NhJ6Wl
 

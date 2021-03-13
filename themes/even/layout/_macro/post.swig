@@ -26,11 +26,19 @@
           </span>
         {%- endif -%}
         {%- if theme.leancloud.app_id and theme.leancloud.app_key -%}
-        <span class="post-visits"
+        {%- if theme.leancloud.show_visits -%}
+          <span class="post-visits"
              data-url="{{ url_for(post.path) }}"
              data-title="{{ post.title }}">
-          {{ __('posts.visits') }} 0
-        </span>
+            {{ __('posts.visits') }} 0
+          </span>
+        {%- else -%}
+          <span class="post-visits" style="display: none;"
+             data-url="{{ url_for(post.path) }}"
+             data-title="{{ post.title }}">
+            {{ __('posts.visits') }} 0
+          </span>
+        {%- endif -%}
         {%- endif -%}
       </div>
     </header>
