@@ -118,6 +118,5 @@ cdn:
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: git
-  repo: 
-    github: git@github.com:YotrolZ/YotrolZ.github.io.git
+  repo: git@github.com:YotrolZ/YotrolZ.github.io.git
   branch: gh
