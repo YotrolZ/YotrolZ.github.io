@@ -3,7 +3,7 @@ name: deploy
 on:
   push:
    branches:
-    - hexo
+    - main
 
 jobs:
   build:
@@ -12,7 +12,7 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@master
         with:
-          ref: hexo
+          ref: main
       - name: Use Node.js 10.x
         uses: actions/setup-node@master
         with:
