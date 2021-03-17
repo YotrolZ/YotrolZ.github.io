@@ -131,7 +131,7 @@
 
   Even.prototype.fancybox = function () {
     var isWechat = window.navigator.userAgent.match(/MicroMessenger/i) == 'micromessenger';
-    if (!isWechat) {
+    if (isWechat) {
       var imgSrcList = new Array();
       $('.post').each(function () {
         $(this).find('img').each(function () {
