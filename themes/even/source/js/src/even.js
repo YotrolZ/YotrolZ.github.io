@@ -139,12 +139,12 @@
           $(this).on("click", function () {
             var curSrc = this.src;
             console.log('imgSrcList', imgSrcList, curSrc);
-            wx.ready(function() {
+            // wx.ready(function() {
               wx.previewImage({
                 current: curSrc, // 当前显示图片的http链接
                 urls: imgSrcList // 需要预览的图片http链接列表
               });
-            });
+            // });
           });
         });
       });
