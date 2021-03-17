@@ -7,7 +7,6 @@
 
   Even.prototype.setup = function() {
     var leancloud = this.config.leancloud;
-    var isMobile = window.navigator.userAgent.match(/mobile/i);
     this.navbar();
     this.responsiveTable();
 
@@ -15,7 +14,7 @@
       this.scrollToc();
       this.tocFollow();
     }
-    if (!isMobile && this.config.fancybox) {
+    if (this.config.fancybox) {
       this.fancybox();
     }
     if (leancloud.app_id && leancloud.app_key) {
@@ -130,7 +129,28 @@
     });
   };
 
+  Even.prototype.wxPreviewImg = function (imgSrcList, curSrc) {
+    wx.ready(function() {
+      wx.previewImage({
+        current: curSrc, // 当前显示图片的http链接
+        urls: imgSrcList // 需要预览的图片http链接列表
+      });
+    });
+  };
+
   Even.prototype.fancybox = function () {
+    var isWechat = window.navigator.userAgent.match(/MicroMessenger/i) == 'micromessenger';
+    if (!isWechat) {
+      var imgSrcList = new Array();
+      $('.post').each(function () {
+        $(this).find('img').each(function () {
+          imgSrcList.push(this.src);
+          console.log('imgSrcList', imgSrcList);
+          $(this).attr("onclick", Even.prototype.wxPreviewImg(imgSrcList, this.src));
+        });
+      });
+      return;
+    }
     if ($.fancybox) {
       $('.post').each(function () {
         $(this).find('img').each(function () {
