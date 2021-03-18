@@ -7,6 +7,7 @@
 
   Even.prototype.setup = function() {
     var leancloud = this.config.leancloud;
+    var isMobile = window.navigator.userAgent.toLowerCase().match(/mobile/i);
     this.navbar();
     this.responsiveTable();
 
@@ -14,7 +15,7 @@
       this.scrollToc();
       this.tocFollow();
     }
-    if (this.config.fancybox) {
+    if (!isMobile && this.config.fancybox) {
       this.fancybox();
     }
     if (leancloud.app_id && leancloud.app_key) {
@@ -130,7 +131,7 @@
   };
 
   Even.prototype.fancybox = function () {
-    var isWechat = window.navigator.userAgent.match(/MicroMessenger/i) == 'micromessenger';
+    var isWechat = false
     if (isWechat) {
       var imgSrcList = new Array();
       $('.post').each(function () {
@@ -141,8 +142,8 @@
             console.log('imgSrcList', imgSrcList, curSrc);
             // wx.ready(function() {
               wx.previewImage({
-                current: curSrc, // 当前显示图片的http链接
-                urls: imgSrcList // 需要预览的图片http链接列表
+                current: curSrc,
+                urls: imgSrcList
               });
             // });
           });
