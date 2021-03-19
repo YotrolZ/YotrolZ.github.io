@@ -90,13 +90,13 @@ tags:
     uintptr_t new = 0;
     
     do {
-        old = LoadExclusiveASM(&_rc);
+        old = LoadExclusive(&_rc);
         new = old;
         
         for(int i = 0; i < 1000000; i++) {
             new++;
         }
-    } while (!StoreExclusiveASM(&_rc, old, new));
+    } while (!StoreExclusive(&_rc, old, new));
 }
 
 
