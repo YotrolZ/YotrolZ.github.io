@@ -13,14 +13,17 @@ jobs:
         uses: actions/checkout@master
         with:
           ref: main
+
       - name: Use Node.js 10.x
         uses: actions/setup-node@master
         with:
           node-version: '10.x'
+
       - name: Setup Hexo Dependencies
         run: |
           npm i -g hexo-cli
           npm install
+
       - name: Setup Deploy Private Key
         env:
           HEXO_DEPLOY_PRI: ${{secrets.HEXO_DEPLOY_PRI}}
@@ -29,11 +32,13 @@ jobs:
           echo "$HEXO_DEPLOY_PRI" > ~/.ssh/id_rsa 
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
+
       - name: Config Git Infomation
         run: |
           git config --global user.name "YotrolZ" 
           git config --global user.email "674317983@qq.com"
-      - name: Deploy Hexo
+      
+      - name: Deploy Github page Hexo repo
         env:
           TZ: Asia/Shanghai
         run: |
@@ -41,3 +46,16 @@ jobs:
           hexo generate 
           gulp
           hexo deploy
+
+      # 使用 GITEE_ACCESS_TOKEN 直接使用 push 操作 进行部署
+      - name: Push Gitee pages repo
+        env:
+          TZ: Asia/Shanghai
+          GITEE_REPO: https://gitee.com/YotrolZ/blog.git
+        run: |
+          cd ./public && git init && git add .
+          git config user.name "YotrolZ"
+          git config user.email "207213149@qq.com"
+          git add .
+          git commit -m "GitHub Actions Auto Push at $(date +'%Y-%m-%d %H:%M:%S')"
+          git push --force --quiet "https://YotrolZ:${{ secrets.GITEE_ACCESS_TOKEN }}@$GITEE_REPO" master:master
