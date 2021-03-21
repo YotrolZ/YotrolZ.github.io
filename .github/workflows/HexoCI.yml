@@ -48,14 +48,14 @@ jobs:
           hexo deploy
 
       # 使用 GITEE_ACCESS_TOKEN 直接使用 push 操作 进行部署
-      - name: Push Gitee pages repo
-        env:
-          TZ: Asia/Shanghai
-          GITEE_REPO: gitee.com/YotrolZ/yotrolz.gitee.io
-        run: |
-          cd ./public && git init && git add .
-          git config user.name "YotrolZ"
-          git config user.email "207213149@qq.com"
-          git add .
-          git commit -m "GitHub Actions Auto Push at $(date +'%Y-%m-%d %H:%M:%S')"
-          git push --force --quiet "https://YotrolZ:${{secrets.GITEE_ACCESS_TOKEN}}@$GITEE_REPO" master:master
+      # - name: Push Gitee pages repo
+      #   env:
+      #     TZ: Asia/Shanghai
+      #     GITEE_REPO: gitee.com/YotrolZ/yotrolz.gitee.io
+      #   run: |
+      #     cd ./public && git init && git add .
+      #     git config user.name "YotrolZ"
+      #     git config user.email "207213149@qq.com"
+      #     git add .
+      #     git commit -m "GitHub Actions Auto Push at $(date +'%Y-%m-%d %H:%M:%S')"
+      #     git push --force --quiet "https://YotrolZ:${{secrets.GITEE_ACCESS_TOKEN}}@$GITEE_REPO" master:master
