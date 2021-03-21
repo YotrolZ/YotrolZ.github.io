@@ -51,7 +51,7 @@ jobs:
       - name: Push Gitee pages repo
         env:
           TZ: Asia/Shanghai
-          GITEE_REPO: https://gitee.com/YotrolZ/blog.git
+          GITEE_REPO: gitee.com/YotrolZ/blog.git
         run: |
           cd ./public && git init && git add .
           git config user.name "YotrolZ"
