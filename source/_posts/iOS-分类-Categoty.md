@@ -40,4 +40,4 @@ struct category_t {
 - 将合并后的分类数据（方法、属性、协议），插入到类原来的数据的前面；
     - 这也就造成了分类中的方法会覆盖掉类中的相同的方法；
 
-![Categoty 加载顺序-源码分析](https://upload-images.jianshu.io/upload_images/590107-cec967d140f1dedb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![Categoty 加载顺序-源码分析](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/category加载流程图.png)
