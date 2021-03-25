@@ -6,8 +6,18 @@ tags:
 ---
 
 
+# YYCache 简介
 
-# YYCache API
+先来看一下官方介绍
+- **LRU**: 缓存支持 LRU (least-recently-used) 淘汰算法。
+- **缓存控制**: 支持多种缓存控制方法：总数量、总大小、存活时间、空闲空间。
+- **兼容性**: API 基本和 `NSCache` 保持一致, 所有方法都是`线程安全`的。
+- **内存缓存**
+  - **对象释放控制**: 对象的释放(release) 可以配置为同步或异步进行，可以配置在主线程或后台线程进行。
+  - **自动清空**: 当收到内存警告或 App 进入后台时，缓存可以配置为自动清空。
+- **磁盘缓存**
+  - **可定制性**: 磁盘缓存支持自定义的归档解档方法，以支持那些没有实现 NSCoding 协议的对象。
+  - **存储类型控制**: 磁盘缓存支持对每个对象的存储类型 (SQLite/文件) 进行自动或手动控制，以获得更高的存取性能。
 
 ## 文件目录
 ```c++
@@ -67,6 +77,9 @@ tags:
 
 @end
 ```
+
+- `YYCache` 中 `memoryCache` 和 `diskCache` 均为 `strong` 且 `readonly`；
+- 也就是说当我们外界使用`YYCache`对象的时候，对其内部的 `memoryCache` 和 `diskCache` 成员是 `强引用`
 
 > 知识点: NS_DESIGNATED_INITIALIZER 和 NS_UNAVAILABLE
 
@@ -128,8 +141,9 @@ tags:
 }
 ```
 
-# YYDiskCache 初始化
+# YYDiskCache 磁盘缓存
 
+## YYDiskCache  初始化
 
 ```objc
 @interface YYDiskCache : NSObject
@@ -169,12 +183,12 @@ tags:
       self = [super init];
       if (!self) return nil;
       
-      // 根据path从_YYDiskCacheGetGlobal查找是否存在
+      // ① 根据path利用_YYDiskCacheGetGlobal获取YYDiskCache对象
       YYDiskCache *globalCache = _YYDiskCacheGetGlobal(path);
-      // _YYDiskCacheGetGlobal存在的话直接返回，不再创建
+      // 存在的话直接返回，不需创建
       if (globalCache) return globalCache;
       
-      // 创建 YYKVStorage
+      // ② 真正的初始化操作
       YYKVStorageType type;
       if (threshold == 0) {
           type = YYKVStorageTypeFile;
@@ -189,7 +203,7 @@ tags:
       
       _kv = kv;
       _path = path;
-      // 使用GCD 信号量 创建了一把锁，用户数据同步
+      // 使用GCD 信号量 创建了一把锁，保证线程安全
       _lock = dispatch_semaphore_create(1);
       // 创建了一个自定义的并发队列
       _queue = dispatch_queue_create("com.ibireme.cache.disk", DISPATCH_QUEUE_CONCURRENT);
@@ -202,13 +216,71 @@ tags:
       
       [self _trimRecursively];
 
-      // 存入 _YYDiskCacheSetGlobal
+      // ③ 存入：_YYDiskCacheSetGlobal
       _YYDiskCacheSetGlobal(self);
       
       [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_appWillBeTerminated) name:UIApplicationWillTerminateNotification object:nil];
       return self;
   }
   ```
+
+## 从缓存中获取YYDiskCache对象
+
+在上文中我们得知，`YYDiskCache`在初始化的时候，首先会根据`path` 调用 `_YYDiskCacheGetGlobal`来进行查找，如果查到，就直接返回，如果没有找到就执行一系列的初始化操作，然后又调用 `_YYDiskCacheSetGlobal` 将创建好的`YYDiskCache` 对象存入，现在我们来分析一下 `_YYDiskCacheGetGlobal` 和 `_YYDiskCacheSetGlobal`；
+
+```c++
+/// weak reference for all instances
+static NSMapTable *_globalInstances;
+static dispatch_semaphore_t _globalInstancesLock;
+```
+- 定义了一个全局的 `NSMapTable` 类型的 `_globalInstances` 和 一个 `dispatch_semaphore_t` 类型的 `_globalInstancesLock`;
+- `_globalInstances`：存放所有的 `YYDiskCache` 对象
+- `dispatch_semaphore_t`：用来保证`线程安全`
+
+
+### _YYDiskCacheInitGlobal
+
+```c++
+static void _YYDiskCacheInitGlobal() {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _globalInstancesLock = dispatch_semaphore_create(1);
+        _globalInstances = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsStrongMemory valueOptions:NSPointerFunctionsWeakMemory capacity:0];
+    });
+}
+```
+- 使用`dispatch_once`保证只初始化一次；
+- 🔔❗️❗️❗️ `_globalInstances` 用来存放所有的 `YYDiskCache`对象， 使用 `NSMapTable` + `NSPointerFunctionsWeakMemory`， `弱引用` 内部的 `YYDiskCache`对象；
+
+### _YYDiskCacheGetGlobal
+```c++
+static YYDiskCache *_YYDiskCacheGetGlobal(NSString *path) {
+    if (path.length == 0) return nil;
+    _YYDiskCacheInitGlobal();
+    dispatch_semaphore_wait(_globalInstancesLock, DISPATCH_TIME_FOREVER);
+    id cache = [_globalInstances objectForKey:path];
+    dispatch_semaphore_signal(_globalInstancesLock);
+    return cache;
+}
+```
+- 在调用`_YYDiskCacheGetGlobal`时会调用`_YYDiskCacheInitGlobal` 进行初始化；
+- 由于`_YYDiskCacheInitGlobal`内部使用`dispatch_once`，可保证只初始化了一次；
+
+### _YYDiskCacheSetGlobal
+```c++
+static void _YYDiskCacheSetGlobal(YYDiskCache *cache) {
+    if (cache.path.length == 0) return;
+    _YYDiskCacheInitGlobal();
+    dispatch_semaphore_wait(_globalInstancesLock, DISPATCH_TIME_FOREVER);
+    [_globalInstances setObject:cache forKey:cache.path];
+    dispatch_semaphore_signal(_globalInstancesLock);
+}
+```
+- 在调用`_YYDiskCacheGetGlobal`时会调用`_YYDiskCacheInitGlobal` 进行初始化；
+- 由于`_YYDiskCacheInitGlobal`内部使用`dispatch_once`，可保证只初始化了一次；
+
+
+## 真正的创建YYDiskCache对象
 
 
 
