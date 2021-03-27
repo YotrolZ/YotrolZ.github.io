@@ -1,6 +1,9 @@
 ---
 title: YYCache源码学习-磁盘缓存分析
-description: `YYDiskCache` 是一个`线程安全`的，用于存储由`SQLite`支持的键值对和`文件系统`（类似于 `NSURLCache` 的磁盘缓存）。采用LRU来移除数据；不同数据自动采用不同的存储机制：`sqlite` 或 `file`；支持`同步`与`异步`的方式调用等特性。
+description: >-
+  YYDiskCache 是一个`线程安全`的，用于存储由`SQLite`支持的键值对和`文件系统`（类似于 `NSURLCache`
+  的磁盘缓存）。采用LRU来移除数据；不同数据自动采用不同的存储机制：`sqlite` 或 `file`；支持`同步`与`异步`的方式调用等特性。
+abbrlink: 5c5f8fb2
 date: 2019-10-22 13:52:50
 tags:
 ---
