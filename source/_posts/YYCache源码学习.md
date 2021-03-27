@@ -189,35 +189,7 @@ tags:
       if (globalCache) return globalCache;
       
       // ② 真正的初始化操作
-      YYKVStorageType type;
-      if (threshold == 0) {
-          type = YYKVStorageTypeFile;
-      } else if (threshold == NSUIntegerMax) {
-          type = YYKVStorageTypeSQLite;
-      } else {
-          type = YYKVStorageTypeMixed;
-      }
-      
-      YYKVStorage *kv = [[YYKVStorage alloc] initWithPath:path type:type];
-      if (!kv) return nil;
-      
-      _kv = kv;
-      _path = path;
-      // 使用GCD 信号量 创建了一把锁，保证线程安全
-      _lock = dispatch_semaphore_create(1);
-      // 创建了一个自定义的并发队列
-      _queue = dispatch_queue_create("com.ibireme.cache.disk", DISPATCH_QUEUE_CONCURRENT);
-      _inlineThreshold = threshold;
-      _countLimit = NSUIntegerMax;
-      _costLimit = NSUIntegerMax;
-      _ageLimit = DBL_MAX;
-      _freeDiskSpaceLimit = 0;
-      _autoTrimInterval = 60;
-      
-      [self _trimRecursively];
-
-      // ③ 存入：_YYDiskCacheSetGlobal
-      _YYDiskCacheSetGlobal(self);
+      ······ // 下文分析
       
       [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_appWillBeTerminated) name:UIApplicationWillTerminateNotification object:nil];
       return self;
@@ -281,7 +253,53 @@ static void _YYDiskCacheSetGlobal(YYDiskCache *cache) {
 
 
 ## 真正的创建YYDiskCache对象
+```objc
+- (instancetype)initWithPath:(NSString *)path
+            inlineThreshold:(NSUInteger)threshold {
+    self = [super init];
+    if (!self) return nil;
+    
+    // ① 根据path利用_YYDiskCacheGetGlobal获取YYDiskCache对象
+    YYDiskCache *globalCache = _YYDiskCacheGetGlobal(path);
+    // 存在的话直接返回，不需创建
+    if (globalCache) return globalCache;
+    
+    // ② YYDiskCache 真正的初始化操作
+    YYKVStorageType type;
+    if (threshold == 0) {
+        type = YYKVStorageTypeFile;
+    } else if (threshold == NSUIntegerMax) {
+        type = YYKVStorageTypeSQLite;
+    } else {
+        type = YYKVStorageTypeMixed;
+    }
+    
+    // 真正实现数据存取的对象
+    YYKVStorage *kv = [[YYKVStorage alloc] initWithPath:path type:type];
+    if (!kv) return nil;
+    
+    _kv = kv;
+    _path = path;
+    // 使用GCD 信号量 创建了一把锁，保证线程安全
+    _lock = dispatch_semaphore_create(1);
+    // 创建了一个自定义的并发队列
+    _queue = dispatch_queue_create("com.ibireme.cache.disk", DISPATCH_QUEUE_CONCURRENT);
+    _inlineThreshold = threshold;
+    _countLimit = NSUIntegerMax;
+    _costLimit = NSUIntegerMax;
+    _ageLimit = DBL_MAX;
+    _freeDiskSpaceLimit = 0;
+    _autoTrimInterval = 60;
+    
+    [self _trimRecursively];
 
+    // ③ 存入：_YYDiskCacheSetGlobal
+    _YYDiskCacheSetGlobal(self);
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_appWillBeTerminated) name:UIApplicationWillTerminateNotification object:nil];
+    return self;
+}
+```
 
 
 # YYMemoryCache 初始化
