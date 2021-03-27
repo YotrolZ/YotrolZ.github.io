@@ -9,9 +9,10 @@ tags:
 ---
 
 
-在上一篇文章中，我们对`YYCache`的初始化操作了做了见得分析，具体代码如下：
+在[上一篇文章](https://yotrolz.com/posts/ba9af90f/)中，我们对`YYCache`的初始化操作了做了简单分析，具体代码如下：
 
 ```objc
+// YYCache.m
 - (instancetype)initWithPath:(NSString *)path {
     if (path.length == 0) return nil;
 
@@ -93,6 +94,8 @@ tags:
 初始化`YYCache`时调用了 `YYDiskCache` 的 `initWithPath` 方法
 
 - 这里主要是对 `inlineThreshold` 阈值进行了初始化(20KB)
+- 至于为何是`20KB`，我们可以参看[YYCache 设计思路
+](https://blog.ibireme.com/2015/10/26/yycache/) 和 [ SQLite官方说明](https://www.sqlite.org/intern-v-extern-blob.html)
   ```objc
   - (instancetype)initWithPath:(NSString *)path {
     return [self initWithPath:path inlineThreshold:1024 * 20]; // 20KB
