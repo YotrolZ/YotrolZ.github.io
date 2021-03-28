@@ -276,6 +276,9 @@ dispatch_semaphore_signal(_globalInstancesLock);
 }
 ```
 
+- 可以看出真正在操作数据的其实是`[_kv removeItemForKey:key];`
+- `_kv` 就是在初始化 `YYDiskCache` 时，创建的 `YYKVStorage` 对象;
+
 > 初始化 `YYDiskCache` 时，创建的 `dispatch_semaphore` 和 `dispatch_queue` 作用:
 
 - `dispatch_semaphore` 用来保证`操作缓存数据`时的`线程安全`；
@@ -284,3 +287,319 @@ dispatch_semaphore_signal(_globalInstancesLock);
 我们只是以`删除操作`为例进行了说明：别的`操作`类似；
 
 
+# YYDiskCache 存储操作
+
+> 以 `- (void)setObject:(id<NSCoding>)object forKey:(NSString *)key;` 为例:
+
+```objc
+// YYDiskCache.m
+- (void)setObject:(id<NSCoding>)object forKey:(NSString *)key {
+    if (!key) return;
+    // 如果 object 为 nil 就执行删除操作
+    if (!object) {
+        [self removeObjectForKey:key];
+        return;
+    }
+    
+    // extendedData: 其实也就是 object 的一个附加数据；
+    // 在保存 object 之前，如果给object设置了这个附加数据，YYDiskCache 也会一并存储；
+    // 获取 object 绑定的 extendedData 数据
+    NSData *extendedData = [YYDiskCache getExtendedDataFromObject:object];
+    // object 对应的 NSData 数据
+    // 可以自定义归档方式 或 使用默认的 NSKeyedArchiver
+    NSData *value = nil;
+    if (_customArchiveBlock) {
+        value = _customArchiveBlock(object);
+    } else {
+        @try {
+            value = [NSKeyedArchiver archivedDataWithRootObject:object];
+        }
+        @catch (NSException *exception) {
+            // nothing to do...
+        }
+    }
+    if (!value) return;
+    NSString *filename = nil;
+    if (_kv.type != YYKVStorageTypeSQLite) {
+        // 🔔❗️❗️❗️
+        // 如果没有明确标明存储方式为 SQLite 自动进行不同方式的存储机制 SQLite / File
+        // 根据存储数据的字节数及阈值进行区分
+        if (value.length > _inlineThreshold) {
+            // 存储数据的大小超过了阈值 获取一个 filename 用于存储文件时使用
+            // filename的生成规则，默认：MD5(key)；也可以通过 `customFileNameBlock(key)` 自定义
+            filename = [self _filenameForKey:key];
+        }
+    }
+    
+    // 加解锁操作，保证数据访问时的线程安全
+    Lock();
+    // 正真的存储操作
+    [_kv saveItemWithKey:key value:value filename:filename extendedData:extendedData];
+    Unlock();
+}
+```
+
+- 有上述得知：`数据量超过阈值`后，会生成一个 `filename`，我们接着分析；
+
+## 存储机制：inline_data / file
+
+```objc
+// YYKVStorage.m
+- (BOOL)saveItemWithKey:(NSString *)key value:(NSData *)value filename:(NSString *)filename extendedData:(NSData *)extendedData {
+    if (key.length == 0 || value.length == 0) return NO;
+    if (_type == YYKVStorageTypeFile && filename.length == 0) {
+        return NO;
+    }
+    
+    // 🔔❗️❗️❗️ 🔔❗️❗️❗️
+    if (filename.length) {
+    // ① 若filename存在(数据量超过了阈值) --> 采用`File`的方式
+        // ①-① 写入 文件 的操作
+        if (![self _fileWriteWithName:filename data:value]) {
+            return NO;
+        }
+        // ①-② 写入 SQLite 的操作
+        if (![self _dbSaveWithKey:key value:value fileName:filename extendedData:extendedData]) {
+            // 操作失败后要将①-①中写入的文件删除
+            [self _fileDeleteWithName:filename];
+            return NO;
+        }
+        return YES;
+    } else {
+    // ② 若filename不存在(数据量小于阈值) --> 采用`inline_data`的方式
+        if (_type != YYKVStorageTypeSQLite) {
+            NSString *filename = [self _dbGetFilenameWithKey:key];
+            if (filename) {
+                [self _fileDeleteWithName:filename];
+            }
+        }
+        // ②-① 写入 SQLite 的操作
+        return [self _dbSaveWithKey:key value:value fileName:nil extendedData:extendedData];
+    }
+}
+```
+
+> 🔔❗️❗️❗️不管数据量超没超过阈值，都会在 `SQLite` 中写入一条数据的
+- 超过阈值：`SQLite` + `File`；(不将`data`数据写入`SQLite`)
+- 没超过阈值：`SQLite` + `inline_data`；
+- 提高存储效率；
+
+我们看一下具体源码实现：
+```objc
+// YYKVStorage.m (私有方法)
+- (BOOL)_dbSaveWithKey:(NSString *)key value:(NSData *)value fileName:(NSString *)fileName extendedData:(NSData *)extendedData {
+    NSString *sql = @"insert or replace into manifest (key, filename, size, inline_data, modification_time, last_access_time, extended_data) values (?1, ?2, ?3, ?4, ?5, ?6, ?7);";
+
+    🔔❗️❗️❗️🔔❗️❗️❗️🔔❗️❗️❗️ // 下文分析
+    sqlite3_stmt *stmt = [self _dbPrepareStmt:sql];
+    if (!stmt) return NO;
+    
+    int timestamp = (int)time(NULL);
+    sqlite3_bind_text(stmt, 1, key.UTF8String, -1, NULL);
+    sqlite3_bind_text(stmt, 2, fileName.UTF8String, -1, NULL);
+    sqlite3_bind_int(stmt, 3, (int)value.length);
+    🔔❗️❗️❗️🔔❗️❗️❗️🔔❗️❗️❗️
+    // fileName 存在时，保存的数据其实是 NULL
+    if (fileName.length == 0) {
+        sqlite3_bind_blob(stmt, 4, value.bytes, (int)value.length, 0);
+    } else {
+        sqlite3_bind_blob(stmt, 4, NULL, 0, 0);
+    }
+    sqlite3_bind_int(stmt, 5, timestamp);
+    sqlite3_bind_int(stmt, 6, timestamp);
+    sqlite3_bind_blob(stmt, 7, extendedData.bytes, (int)extendedData.length, 0);
+    
+    int result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        if (_errorLogsEnabled) NSLog(@"%s line:%d sqlite insert error (%d): %s", __FUNCTION__, __LINE__, result, sqlite3_errmsg(_db));
+        return NO;
+    }
+    return YES;
+}
+```
+
+## SQLite DB 操作
+
+看到这里，大家可能会想，`SQLite DB`操作无非就是写几行`SQL` 跑一下而已，有什么可说的。然而并非如此，`YYCache` 同样做了很多`提高性能`的事情!
+
+### sqlite3_stmt
+
+大家都知道`sqlite3` 有一个 执行的 `SQL` 语句的函数`sqlite3_exec`:
+
+```c++
+SQLITE_API int sqlite3_exec(
+  sqlite3*,                                  /* An open database */
+  const char *sql,                           /* SQL to be evaluated */
+  int (*callback)(void*,int,char**,char**),  /* Callback function */
+  void *,                                    /* 1st argument to callback */
+  char **errmsg                              /* Error msg written here */
+);
+```
+
+其实呢：`SQL`语句可以理解为一种`编程语言`的`源代码`，而想要执行这个`源代码`就必须要进行`编译/解析`，而`sqlite3_stmt`是一个`预编译语句对象`, 该对象的一个`实例`表示一条`SQL`语句，并且`已经被编译成二进制`形式，可以`直接运行`；
+
+`sqlite3_stmt` 的使用流程：
+- ① 使用`sqlite3_prepare_v2()`创建预处理语句对象；
+- ② 使用`sqlite3_bind()`将值绑定到`SQL`上；
+- ③ 通过调用`sqlite3_step()`一次或多次运行`SQL`;
+- ④ 使用`sqlite3_reset()`重置准备好的语句，然后返回到步骤2。这样做0次或更多次。
+- ⑤ 使用`sqlite3_finalize()`销毁对象。
+
+> YYCache 只有在初始化DB(`- (BOOL)_dbInitialize;`)时使用了`sqlite3_exec`执行`SQL`，而`重复性`的增删改查操作都是使用`sqlite3_stmt`来执行`SQL`;
+
+
+### 缓存 `SQL` 操作
+
+接着回到我们的源码：
+```objc
+// 接上文
+sqlite3_stmt *stmt = [self _dbPrepareStmt:sql];
+```
+
+> 采用 `CFMutableDictionaryRef` 缓存 `sqlite3_stmt` 对象
+
+```objc
+// YYKVStorage.m (私有方法)
+- (sqlite3_stmt *)_dbPrepareStmt:(NSString *)sql {
+    if (![self _dbCheck] || sql.length == 0 || !_dbStmtCache) return NULL;
+    // ① 从缓存中查找 sqlite3_stmt 对象
+    sqlite3_stmt *stmt = (sqlite3_stmt *)CFDictionaryGetValue(_dbStmtCache, (__bridge const void *)(sql));
+    if (!stmt) {
+        // ②-① 缓存中没有 --> 调用 sqlite3_prepare_v2 创建
+        int result = sqlite3_prepare_v2(_db, sql.UTF8String, -1, &stmt, NULL);
+        if (result != SQLITE_OK) {
+            if (_errorLogsEnabled) NSLog(@"%s line:%d sqlite stmt prepare error (%d): %s", __FUNCTION__, __LINE__, result, sqlite3_errmsg(_db));
+            return NULL;
+        }
+        // ②-② 将新创建的 sqlite3_stmt 对象 存入缓存
+        CFDictionarySetValue(_dbStmtCache, (__bridge const void *)(sql), stmt);
+    } else {
+        // ③ 缓存中存在 --> 调用 sqlite3_reset 重置一下，供外界使用
+        sqlite3_reset(stmt);
+    }
+    return stmt;
+}
+```
+
+
+`[self _dbCheck]`其实是对DB数据库的一个校验与`重试`处理：
+```objc
+static const NSUInteger kMaxErrorRetryCount = 8;
+static const NSTimeInterval kMinRetryTimeInterval = 2.0;
+- (BOOL)_dbCheck {
+    if (!_db) {
+        // _dbOpenErrorCount: `sqlite3_open` 失败就会加一
+        if (_dbOpenErrorCount < kMaxErrorRetryCount &&
+            CACurrentMediaTime() - _dbLastOpenErrorTime > kMinRetryTimeInterval) {
+            // 重新打开 及 初始化
+            return [self _dbOpen] && [self _dbInitialize];
+        } else {
+            return NO;
+        }
+    }
+    return YES;
+}
+```
+
+
+`[self _dbOpen]`内部会调用`sqlite3_open`打开数据库，打开成功后会创建了一个`_dbStmtCache`，用来缓存`sqlite3_stmt`对象；
+
+```objc
+- (BOOL)_dbOpen {
+    if (_db) return YES;
+    
+    int result = sqlite3_open(_dbPath.UTF8String, &_db);
+    if (result == SQLITE_OK) {
+        CFDictionaryKeyCallBacks keyCallbacks = kCFCopyStringDictionaryKeyCallBacks;
+        CFDictionaryValueCallBacks valueCallbacks = {0};
+        _dbStmtCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &keyCallbacks, &valueCallbacks);
+        _dbLastOpenErrorTime = 0;
+        _dbOpenErrorCount = 0;
+        return YES;
+    } else {
+        _db = NULL;
+        if (_dbStmtCache) CFRelease(_dbStmtCache);
+        _dbStmtCache = NULL;
+        _dbLastOpenErrorTime = CACurrentMediaTime();
+        _dbOpenErrorCount++;
+        
+        if (_errorLogsEnabled) {
+            NSLog(@"%s line:%d sqlite open failed (%d).", __FUNCTION__, __LINE__, result);
+        }
+        return NO;
+    }
+}
+```
+
+
+### sqlite3 WAL
+
+- `WAL`的全称是`Write Ahead Logging`，它是很多数据库中用于实现`原子事务`的一种机制，`SQLite`在`3.7.0`版本引入了该特性。
+- 在引入`WAL`机制之前，`SQLite`使用`rollback journal`机制实现`原子事务`。
+
+> `rollback journal` VS `WAL`
+
+- `rollback journal`机制：修改数据之前，先对要修改的数据进行`备份`，如果事务成功，就提交修改并删除备份；如果事务失败：就将备份数据拷贝回去，撤销修改；
+- `WAL`机制：当修改数据时，并不直接写入数据库，而是写入到另外一个`WAL`文件中；如果事务成功：将会在随后的`某个时间节点`写回到数据库；如果事务失败：`WAL`文件中的记录会被忽略；
+    - 同步`WAL`文件和数据库文件的行为称为`checkpoint`，它有`SQLite`自动执行，默认：`WAL`文件累计到`1000页`修改；
+    - 也可以通过`SQLITE_API int sqlite3_wal_checkpoint(sqlite3 *db, const char *zDb);`手动执行并重置`WAL`；
+
+> 可以在 [SQLite官方文档](https://www.sqlite.org/pragma.html#pragma_wal_checkpoint) 查阅相关使用介绍：
+
+-  `SQL`语句中使用
+```SQL
+// journal_mode 模式；
+// 比如：PRAGMA journal_mode = wal;
+PRAGMA journal_mode
+```
+```SQL
+PRAGMA wal_checkpoint
+```
+```SQL
+PRAGMA wal_autocheckpoint
+```
+
+- 函数调用
+```c++
+// 将WAL中的预写日志转移到数据库文件中，并被重置WAL预写日志
+SQLITE_API int sqlite3_wal_checkpoint(
+    sqlite3 *db, 
+    const char *zDb
+);
+```
+
+```c++
+// 配置 autocheckpoint
+// 每个新的[database connection] 默认开启 auto-checkpoint，默认值：1000
+SQLITE_API int sqlite3_wal_autocheckpoint(
+    sqlite3 *db, 
+    int N
+);
+```
+
+```objc
+// 注册一个回调函数，在wal模式下，每次数据提交到数据库时都会调用这个回调函数
+SQLITE_API void *sqlite3_wal_hook(
+    sqlite3*, 
+    int(*)(void *,sqlite3*,const char*,int),
+    void*
+);
+```
+
+> `YYDiskCache` 中的 `SQLite WAL`
+
+```objc
+- (BOOL)_dbInitialize {
+    NSString *sql = @"pragma journal_mode = wal; pragma synchronous = normal; create table if not exists manifest (key text, filename text, size integer, inline_data blob, modification_time integer, last_access_time integer, extended_data blob, primary key(key)); create index if not exists last_access_time_idx on manifest(last_access_time);";
+    return [self _dbExecute:sql];
+}
+```
+
+```objc
+- (void)_dbCheckpoint {
+    if (![self _dbCheck]) return;
+    // Cause a checkpoint to occur, merge `sqlite-wal` file to `sqlite` file.
+    sqlite3_wal_checkpoint(_db, NULL);
+}
+```
+- 在`YYKVStorage.m`中的部分`remove`操作中使用到了`_dbCheckpoint`
