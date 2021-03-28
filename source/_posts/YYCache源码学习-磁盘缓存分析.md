@@ -547,44 +547,44 @@ static const NSTimeInterval kMinRetryTimeInterval = 2.0;
 > 可以在 [SQLite官方文档](https://www.sqlite.org/pragma.html#pragma_wal_checkpoint) 查阅相关使用介绍：
 
 -  `SQL`语句中使用
-```SQL
-// journal_mode 模式；
-// 比如：PRAGMA journal_mode = wal;
-PRAGMA journal_mode
-```
-```SQL
-PRAGMA wal_checkpoint
-```
-```SQL
-PRAGMA wal_autocheckpoint
-```
+    ```SQL
+    // journal_mode 模式；
+    // 比如：PRAGMA journal_mode = wal;
+    PRAGMA journal_mode
+    ```
+    ```SQL
+    PRAGMA wal_checkpoint
+    ```
+    ```SQL
+    PRAGMA wal_autocheckpoint
+    ```
 
 - 函数调用
-```c++
-// 将WAL中的预写日志转移到数据库文件中，并被重置WAL预写日志
-SQLITE_API int sqlite3_wal_checkpoint(
-    sqlite3 *db, 
-    const char *zDb
-);
-```
+    ```c++
+    // 将WAL中的预写日志转移到数据库文件中，并被重置WAL预写日志
+    SQLITE_API int sqlite3_wal_checkpoint(
+        sqlite3 *db, 
+        const char *zDb
+    );
+    ```
 
-```c++
-// 配置 autocheckpoint
-// 每个新的[database connection] 默认开启 auto-checkpoint，默认值：1000
-SQLITE_API int sqlite3_wal_autocheckpoint(
-    sqlite3 *db, 
-    int N
-);
-```
+    ```c++
+    // 配置 autocheckpoint
+    // 每个新的[database connection] 默认开启 auto-checkpoint，默认值：1000
+    SQLITE_API int sqlite3_wal_autocheckpoint(
+        sqlite3 *db, 
+        int N
+    );
+    ```
 
-```objc
-// 注册一个回调函数，在wal模式下，每次数据提交到数据库时都会调用这个回调函数
-SQLITE_API void *sqlite3_wal_hook(
-    sqlite3*, 
-    int(*)(void *,sqlite3*,const char*,int),
-    void*
-);
-```
+    ```objc
+    // 注册一个回调函数，在wal模式下，每次数据提交到数据库时都会调用这个回调函数
+    SQLITE_API void *sqlite3_wal_hook(
+        sqlite3*, 
+        int(*)(void *,sqlite3*,const char*,int),
+        void*
+    );
+    ```
 
 > `YYDiskCache` 中的 `SQLite WAL`
 
