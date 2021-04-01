@@ -1,5 +1,5 @@
 ---
-title: YYCache源码学习
+title: YYCache源码学习-初始化分析
 date: '2019-10-19 15:26:28'
 abbrlink: ba9af90f
 tags:
