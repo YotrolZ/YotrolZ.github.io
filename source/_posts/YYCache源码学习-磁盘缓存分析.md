@@ -802,5 +802,5 @@ static const NSTimeInterval kMinRetryTimeInterval = 2.0;
 ## trim 操作
 - ① 当我们删减数据时，根据`last_access_time`升序取出`一定数量(每次16个)`的数据；
 - ② 对取出的数据分别进行删除操作；
-    - 对于File,还需要一并将`File`删除；
+    - 对于`File`，还需要一并将`File`删除；
 - ③ 删除过程中，判断是否已经满足删减要求；未满足的话继续从①开始，直到满足删减要求；
