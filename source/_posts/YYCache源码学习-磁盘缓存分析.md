@@ -603,3 +603,204 @@ static const NSTimeInterval kMinRetryTimeInterval = 2.0;
 }
 ```
 - 在`YYKVStorage.m`中的部分`remove`操作中使用到了`_dbCheckpoint`
+
+
+# YYDiskCache LRU
+
+> 以 `- (void)trimToCount:(NSUInteger)count;` 为例:
+
+```objc
+// YYDiskCache.m
+- (void)trimToCount:(NSUInteger)count {
+    Lock(); // 加锁
+    [self _trimToCount:count]; // 移除操作
+    Unlock(); // 解锁
+}
+```
+
+```objc
+// YYDiskCache.m
+- (void)_trimToCount:(NSUInteger)countLimit {
+    if (countLimit >= INT_MAX) return;
+    [_kv removeItemsToFitCount:(int)countLimit];
+}
+```
+
+- 真正的移除操作其实还是 `_kv`;
+
+```objc
+// YYKVStorage.m
+- (BOOL)removeItemsToFitCount:(int)maxCount {
+    if (maxCount == INT_MAX) return YES;
+    if (maxCount <= 0) return [self removeAllItems];
+    
+    int total = [self _dbGetTotalItemCount];
+    if (total < 0) return NO;
+    if (total <= maxCount) return YES;
+    
+    NSArray *items = nil;
+    BOOL suc = NO;
+    do {
+        // ① 定义每次从 SQLite DB 取出的数据量为：16个
+        int perCount = 16;
+        // ② 从 SQLite DB 取出相应数量的数据
+        items = [self _dbGetItemSizeInfoOrderByTimeAscWithLimit:perCount];
+        // ③ 对取出的数据进行遍历删除操作，直到符合删减的要求
+        for (YYKVStorageItem *item in items) {
+            if (total > maxCount) {
+                // ③-① 如果是File方式，还需要将File一并删除
+                if (item.filename) {
+                    [self _fileDeleteWithName:item.filename];
+                }
+                // ③-② 删除SQLite DB中的数据
+                suc = [self _dbDeleteItemWithKey:item.key];
+                total--;
+            } else {
+                break;
+            }
+            if (!suc) break;
+        }
+    } while (total > maxCount && items.count > 0 && suc);
+    if (suc) [self _dbCheckpoint];
+    return suc;
+}
+```
+
+- ① 定义每次从 SQLite DB 取出的数据量为：16个
+- ② 从 SQLite DB 取出相应数量的数据
+- ③ 对取出的数据进行遍历删除操作，直到符合删减的要求
+    - ③-① 如果是File方式，还需要将File一并删除
+    - ③-② 删除SQLite DB中的数据
+
+> 由上可知：LRU 应该在 `② 从 SQLite DB 取出相应数量的数据；` 中有所体现；
+
+```objc
+// YYKVStorage.m
+- (NSMutableArray *)_dbGetItemSizeInfoOrderByTimeAscWithLimit:(int)count {
+    NSString *sql = @"select key, filename, size from manifest order by last_access_time asc limit ?1;";
+    sqlite3_stmt *stmt = [self _dbPrepareStmt:sql];
+    if (!stmt) return nil;
+    sqlite3_bind_int(stmt, 1, count);
+    
+    NSMutableArray *items = [NSMutableArray new];
+    do {
+        int result = sqlite3_step(stmt);
+        if (result == SQLITE_ROW) {
+            char *key = (char *)sqlite3_column_text(stmt, 0);
+            char *filename = (char *)sqlite3_column_text(stmt, 1);
+            int size = sqlite3_column_int(stmt, 2);
+            NSString *keyStr = key ? [NSString stringWithUTF8String:key] : nil;
+            if (keyStr) {
+                YYKVStorageItem *item = [YYKVStorageItem new];
+                item.key = key ? [NSString stringWithUTF8String:key] : nil;
+                item.filename = filename ? [NSString stringWithUTF8String:filename] : nil;
+                item.size = size;
+                [items addObject:item];
+            }
+        } else if (result == SQLITE_DONE) {
+            break;
+        } else {
+            if (_errorLogsEnabled) NSLog(@"%s line:%d sqlite query error (%d): %s", __FUNCTION__, __LINE__, result, sqlite3_errmsg(_db));
+            items = nil;
+            break;
+        }
+    } while (1);
+    return items;
+}
+```
+
+执行的`SQL`语句是：
+`select key, filename, size from manifest order by last_access_time asc limit ?1;`
+
+- 按照`last_access_time`升序排列依次取出；
+- 同样使用`sqlite3_stmt`执行`SQL`；
+
+> 那么`last_access_time`升序和`LRU`有什么关系呢？
+
+那我们就不得不在提一个AP，以`- (nullable id<NSCoding>)objectForKey:(NSString *)key;`为例：
+
+```objc
+// YYDiskCache.m
+- (id<NSCoding>)objectForKey:(NSString *)key {
+    if (!key) return nil;
+    Lock(); // 加锁
+    YYKVStorageItem *item = [_kv getItemForKey:key]; // get 操作(这里主要分析)
+    Unlock();// 解锁
+    if (!item.value) return nil;
+    
+    id object = nil;
+    if (_customUnarchiveBlock) {
+        object = _customUnarchiveBlock(item.value);
+    } else {
+        @try {
+            object = [NSKeyedUnarchiver unarchiveObjectWithData:item.value];
+        }
+        @catch (NSException *exception) {
+            // nothing to do...
+        }
+    }
+    if (object && item.extendedData) {
+        [YYDiskCache setExtendedData:item.extendedData toObject:object];
+    }
+    return object;
+}
+```
+
+- 真正的读取操作其实还是 `_kv`;
+
+
+```objc
+// YYKVStorage.m
+- (YYKVStorageItem *)getItemForKey:(NSString *)key {
+    if (key.length == 0) return nil;
+    YYKVStorageItem *item = [self _dbGetItemWithKey:key excludeInlineData:NO];
+    if (item) {
+        // 🔔❗️❗️❗️🔔❗️❗️❗️🔔❗️❗️❗️
+        // 更新SQLite DB 中本条数据的 AccessTime
+        [self _dbUpdateAccessTimeWithKey:key];
+        if (item.filename) {
+            item.value = [self _fileReadWithName:item.filename];
+            if (!item.value) {
+                [self _dbDeleteItemWithKey:key];
+                item = nil;
+            }
+        }
+    }
+    return item;
+}
+```
+
+```objc
+// YYKVStorage.m
+- (BOOL)_dbUpdateAccessTimeWithKey:(NSString *)key {
+    NSString *sql = @"update manifest set last_access_time = ?1 where key = ?2;";
+    sqlite3_stmt *stmt = [self _dbPrepareStmt:sql];
+    if (!stmt) return NO;
+    sqlite3_bind_int(stmt, 1, (int)time(NULL));
+    sqlite3_bind_text(stmt, 2, key.UTF8String, -1, NULL);
+    int result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        if (_errorLogsEnabled) NSLog(@"%s line:%d sqlite update error (%d): %s", __FUNCTION__, __LINE__, result, sqlite3_errmsg(_db));
+        return NO;
+    }
+    return YES;
+}
+```
+
+
+执行的`SQL`语句是：
+`update manifest set last_access_time = ?1 where key = ?2;`
+
+- 更新本条数据的 `last_access_time`；
+- 同样使用`sqlite3_stmt`执行`SQL`；
+
+
+> 至此：YYDiskCache 中关于 LRU 的实现也就明朗了~
+
+## get 操作：
+- 每次在读取数据的时候，都会更新数据的`last_access_time`；
+## trim 操作
+- ① 当我们删减数据时，根据`last_access_time`升序取出`一定数量(每次16个)`的数据；
+- ② 对取出的数据分别进行删除操作；
+    - 对于File,还需要一并将`File`删除；
+- ③ 删除过程中，判断是否已经满足删减要求；未满足的话继续从①开始，直到满足删减要求；
