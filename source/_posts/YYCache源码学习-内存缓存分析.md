@@ -39,13 +39,13 @@ tags:
 先来看一下官方介绍(可在源码中查阅):
 ```
 `YYMemoryCache`是一种快速的`内存缓存`，用于存储`键值对`。
-与NSDictionary不同，键值是保留的，而不是复制的。
+与NSDictionary不同，key是retain的，而不是copy(必须符合NSCopying协议)的。
 API和性能类似于`NSCache`，所有方法都是`线程安全`的。
 
 YYMemoryCache对象与NSCache在以下几个方面有所不同:
 - 它使用LRU(最近最少使用)删除对象;NSCache驱逐的方法
 是不确定的。
-- 可通过成本、计数、使用年限进行控制;NSCache的限制并不精确。
+- 可通过cost、count、age进行控制;NSCache的限制并不精确。
 - 可配置为当收到内存警告或app进入后台时自动清除对象。
 
 `YYMemoryCache`中读取操作相关的api的时间复杂度O(1)。
@@ -68,10 +68,10 @@ YYMemoryCache对象与NSCache在以下几个方面有所不同:
 - (instancetype)init {
     self = super.init;
 
-    // 锁
+    // 初始化锁
     pthread_mutex_init(&_lock, NULL);
 
-    // 双向链表结构
+    // 双向链表结构(下文深入分析)
     _lru = [_YYLinkedMap new];
 
     // 自定义的一个串行队列
@@ -90,11 +90,99 @@ YYMemoryCache对象与NSCache在以下几个方面有所不同:
     _shouldRemoveAllObjectsOnMemoryWarning = YES;
     _shouldRemoveAllObjectsWhenEnteringBackground = YES;
     
-    // 添加了 内存警告 及 进入后台 的两个通知
+    // 监听了内存警告及进入后台的两个通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_appDidReceiveMemoryWarningNotification) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_appDidEnterBackgroundNotification) name:UIApplicationDidEnterBackgroundNotification object:nil];
     
+    // 递归删减数据(和上文的 _autoTrimInterval 配合使用)
     [self _trimRecursively];
     return self;
 }
 ```
+
+# YYMemoryCache 定时探测机制
+
+在`YYMemoryCache`初始化的时候，初始化了 `_autoTrimInterval = 5.0;` 然后又接着调用了`[self _trimRecursively];` 
+
+```objc
+// YYMemoryCache.m
+- (void)_trimRecursively {
+    __weak typeof(self) _self = self;
+
+    // dispatch_after: 5秒后调用
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_autoTrimInterval * NSEC_PER_SEC)), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+        __strong typeof(_self) self = _self;
+        if (!self) return;
+        [self _trimInBackground]; // 删减数据的操作
+        [self _trimRecursively];  // 递归调用
+    });
+}
+
+// 删减数据的操作
+- (void)_trimInBackground {
+    dispatch_async(_queue, ^{
+        [self _trimToCost:self->_costLimit];
+        [self _trimToCount:self->_countLimit];
+        [self _trimToAge:self->_ageLimit];
+    });
+}
+```
+
+`YYMemoryCache`定时探测机制：
+
+- 默认5秒一次探测；`_autoTrimInterval = 5.0;`
+- 使用`dispatch_after` + `递归调用` 实现定时探测；
+- `dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)`：低优先级的全局队列
+
+
+# _YYLinkedMap & _YYLinkedMapNode
+
+`_YYLinkedMap` & `_YYLinkedMapNode`为内部私有类；
+
+```objc
+@interface _YYLinkedMap : NSObject {
+    @package
+    CFMutableDictionaryRef _dic; // do not set object directly
+    NSUInteger _totalCost;
+    NSUInteger _totalCount;
+    _YYLinkedMapNode *_head; // MRU, do not change it directly
+    _YYLinkedMapNode *_tail; // LRU, do not change it directly
+    BOOL _releaseOnMainThread;
+    BOOL _releaseAsynchronously;
+}
+
+/// 在头部插入一个node，并更新 total cost
+- (void)insertNodeAtHead:(_YYLinkedMapNode *)node;
+
+/// 将node移动到头部(这个节点需要已经存在于dic中)
+- (void)bringNodeToHead:(_YYLinkedMapNode *)node;
+
+/// 移除一个node(这个节点需要已经存在于dic中)
+- (void)removeNode:(_YYLinkedMapNode *)node;
+
+/// 移除尾部node(如果存在的话)
+- (_YYLinkedMapNode *)removeTailNode;
+
+/// 移除全部node，并且在后台队列
+- (void)removeAll;
+
+@end
+```
+
+```objc
+@interface _YYLinkedMapNode : NSObject {
+    @package
+    __unsafe_unretained _YYLinkedMapNode *_prev; // retained by dic
+    __unsafe_unretained _YYLinkedMapNode *_next; // retained by dic
+    id _key;
+    id _value;
+    NSUInteger _cost;
+    NSTimeInterval _time;
+}
+@end
+```
+- 由于 `_YYLinkedMapNode`对象已经存在于`_dic`内，且被`retain` ,`_YYLinkedMapNode`对象内部的`_prev` 和 `_next` 使用的是`__unsafe_unretained`;
+
+![_YYLinkedMapNode](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/YYCache/YYLinkedMap.jpg)
+
+
