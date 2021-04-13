@@ -189,7 +189,17 @@ YYMemoryCache对象与NSCache在以下几个方面有所不同:
 
 # YYMemoryCache LRU
 
-从以下四个API来讲解 `YYMemoryCache` `LRU`;
+从以下`四个`API来讲解 `YYMemoryCache` `LRU`;
+
+```objc
+- (void)trimToCount:(NSUInteger)count;  // YYMemoryCache
+
+- (_YYLinkedMapNode *)removeTailNode;   // _YYLinkedMap
+
+- (nullable id)objectForKey:(id)key;    // YYMemoryCache
+
+- (void)bringNodeToHead:(_YYLinkedMapNode *)node; // _YYLinkedMap
+```
 
 ## trimToCount
 
