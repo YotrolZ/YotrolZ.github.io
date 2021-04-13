@@ -102,7 +102,8 @@ YYMemoryCache对象与NSCache在以下几个方面有所不同:
 
 # YYMemoryCache 定时探测机制
 
-在`YYMemoryCache`初始化的时候，初始化了 `_autoTrimInterval = 5.0;` 然后又接着调用了`[self _trimRecursively];` 
+- `YYMemoryCache` 内部有一个定时任务，用来检查缓存是否到达极限，如果达到极限，就开始删除数据
+- 在`YYMemoryCache`初始化的时候，初始化了 `_autoTrimInterval = 5.0;` 即：定时周期默认为5秒。
 
 ```objc
 // YYMemoryCache.m
