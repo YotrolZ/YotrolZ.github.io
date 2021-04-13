@@ -233,7 +233,7 @@ YYMemoryCache对象与NSCache在以下几个方面有所不同:
     NSMutableArray *holder = [NSMutableArray new];
     while (!finish) {
         if (pthread_mutex_trylock(&_lock) == 0) {
-            // 如果当前存储的 count 超标 就移除尾部节点， 知道符合要求
+            // 如果当前存储的 count 超标 就移除尾部节点， 直到符合要求
             if (_lru->_totalCount > countLimit) {
                 _YYLinkedMapNode *node = [_lru removeTailNode];
                 if (node) [holder addObject:node];
@@ -346,5 +346,42 @@ dispatch_async(queue, ^{
     node->_prev = nil;
     _head->_prev = node;
     _head = node;
+}
+```
+
+
+# YYMemoryCache读取操作时间复杂度O(1)
+
+在官方的文档中，我们得知 `YYMemoryCache` 读取操作相关api的时间复杂度为 `O(1)`,那么是如何做到的呢？
+
+```objc
+@interface _YYLinkedMap : NSObject {
+    @package
+    CFMutableDictionaryRef _dic; // do not set object directly
+    NSUInteger _totalCost;
+    NSUInteger _totalCount;
+    _YYLinkedMapNode *_head; // MRU, do not change it directly
+    _YYLinkedMapNode *_tail; // LRU, do not change it directly
+    BOOL _releaseOnMainThread;
+    BOOL _releaseAsynchronously;
+}
+```
+
+其实就是这个 `CFMutableDictionaryRef` 类型的 `_dic`;
+`CFMutableDictionaryRef` 本质是一个 `哈希结构`;
+
+```objc
+- (id)objectForKey:(id)key {
+    if (!key) return nil;
+    pthread_mutex_lock(&_lock);
+
+    // 直接从 CFMutableDictionaryRef 中取出数据
+    _YYLinkedMapNode *node = CFDictionaryGetValue(_lru->_dic, (__bridge const void *)(key));
+    if (node) {
+        node->_time = CACurrentMediaTime();
+        [_lru bringNodeToHead:node];
+    }
+    pthread_mutex_unlock(&_lock);
+    return node ? node->_value : nil;
 }
 ```
