@@ -186,3 +186,54 @@ YYMemoryCache对象与NSCache在以下几个方面有所不同:
 ![_YYLinkedMapNode](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/YYCache/YYLinkedMap.jpg)
 
 
+# YYMemoryCache LRU
+
+> 以`- (void)trimToCount:(NSUInteger)count;`为例来分析 `YYMemoryCache` `LRU` 的实现：
+
+```objc
+// YYMemoryCache.m
+- (void)trimToCount:(NSUInteger)count {
+    if (count == 0) {
+        [self removeAllObjects];
+        return;
+    }
+    [self _trimToCount:count];
+}
+```
+
+```objc
+// YYMemoryCache.m
+- (void)_trimToCount:(NSUInteger)countLimit {
+    BOOL finish = NO;
+    pthread_mutex_lock(&_lock);
+    if (countLimit == 0) {
+        [_lru removeAll];
+        finish = YES;
+    } else if (_lru->_totalCount <= countLimit) {
+        finish = YES;
+    }
+    pthread_mutex_unlock(&_lock);
+    if (finish) return;
+    
+    NSMutableArray *holder = [NSMutableArray new];
+    while (!finish) {
+        if (pthread_mutex_trylock(&_lock) == 0) {
+            if (_lru->_totalCount > countLimit) {
+                _YYLinkedMapNode *node = [_lru removeTailNode];
+                if (node) [holder addObject:node];
+            } else {
+                finish = YES;
+            }
+            pthread_mutex_unlock(&_lock);
+        } else {
+            usleep(10 * 1000); //10 ms
+        }
+    }
+    if (holder.count) {
+        dispatch_queue_t queue = _lru->_releaseOnMainThread ? dispatch_get_main_queue() : YYMemoryCacheGetReleaseQueue();
+        dispatch_async(queue, ^{
+            [holder count]; // release in queue
+        });
+    }
+}
+```
