@@ -110,6 +110,7 @@ YYMemoryCache对象与NSCache在以下几个方面有所不同:
 - (void)_trimRecursively {
     __weak typeof(self) _self = self;
 
+    // 🔔❗️❗️❗️ 🔔❗️❗️❗️
     // dispatch_after: 5秒后调用
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_autoTrimInterval * NSEC_PER_SEC)), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
         __strong typeof(_self) self = _self;
@@ -235,6 +236,7 @@ YYMemoryCache对象与NSCache在以下几个方面有所不同:
         if (pthread_mutex_trylock(&_lock) == 0) {
             // 如果当前存储的 count 超标 就移除尾部节点， 直到符合要求
             if (_lru->_totalCount > countLimit) {
+                // 🔔❗️❗️❗️ 🔔❗️❗️❗️
                 _YYLinkedMapNode *node = [_lru removeTailNode];
                 if (node) [holder addObject:node];
             } else {
@@ -318,6 +320,8 @@ dispatch_async(queue, ^{
     if (node) {
         // 更新 _time
         node->_time = CACurrentMediaTime();
+
+        // 🔔❗️❗️❗️ 🔔❗️❗️❗️
         // 将节点移动到头部
         [_lru bringNodeToHead:node];
     }
@@ -357,6 +361,8 @@ dispatch_async(queue, ^{
 ```objc
 @interface _YYLinkedMap : NSObject {
     @package
+
+    // 🔔❗️❗️❗️ 🔔❗️❗️❗️
     CFMutableDictionaryRef _dic; // do not set object directly
     NSUInteger _totalCost;
     NSUInteger _totalCount;
@@ -375,6 +381,7 @@ dispatch_async(queue, ^{
     if (!key) return nil;
     pthread_mutex_lock(&_lock);
 
+    // 🔔❗️❗️❗️ 🔔❗️❗️❗️
     // 直接从 CFMutableDictionaryRef 中取出数据
     _YYLinkedMapNode *node = CFDictionaryGetValue(_lru->_dic, (__bridge const void *)(key));
     if (node) {
