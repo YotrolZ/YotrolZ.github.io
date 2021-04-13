@@ -188,7 +188,11 @@ YYMemoryCache对象与NSCache在以下几个方面有所不同:
 
 # YYMemoryCache LRU
 
-> 以`- (void)trimToCount:(NSUInteger)count;`为例来分析 `YYMemoryCache` `LRU` 的实现：
+从以下四个API来讲解 `YYMemoryCache` `LRU`;
+
+## trimToCount
+
+- 内部会调用`removeTailNode`, 下文分析
 
 ```objc
 // YYMemoryCache.m
@@ -218,6 +222,7 @@ YYMemoryCache对象与NSCache在以下几个方面有所不同:
     NSMutableArray *holder = [NSMutableArray new];
     while (!finish) {
         if (pthread_mutex_trylock(&_lock) == 0) {
+            // 如果当前存储的 count 超标 就移除尾部节点， 知道符合要求
             if (_lru->_totalCount > countLimit) {
                 _YYLinkedMapNode *node = [_lru removeTailNode];
                 if (node) [holder addObject:node];
@@ -235,5 +240,100 @@ YYMemoryCache对象与NSCache在以下几个方面有所不同:
             [holder count]; // release in queue
         });
     }
+}
+```
+
+> 在`iOS 保持界面流畅的技巧`文章中作者提到:
+```objc
+/*
+对象的销毁虽然消耗资源不多，但累积起来也是不容忽视的。
+通常当容器类持有大量对象时，其销毁时的资源消耗就非常明显。
+同样的，如果对象可以放到后台线程去释放，那就挪到后台线程去。
+
+这里有个小 Tip：
+把对象捕获到 block 中，然后扔到后台队列去随便发送个消息以避免编译器警告
+就可以让对象在后台线程销毁了。
+ */
+
+NSArray *tmp = self.array;
+self.array = nil;
+dispatch_async(queue, ^{
+    [tmp class];
+});
+```
+
+## removeTailNode
+
+```objc
+// YYMemoryCache.m
+- (_YYLinkedMapNode *)removeTailNode {
+    if (!_tail) return nil;
+
+    // 获取 _tail 尾部节点
+    _YYLinkedMapNode *tail = _tail;
+    
+    // 从CFDictionary中移除
+    CFDictionaryRemoveValue(_dic, (__bridge const void *)(_tail->_key));
+    
+    // 更新容量等信息
+    _totalCost -= _tail->_cost;
+    _totalCount--;
+
+    // 重新计算 _tail 尾部节点 
+    if (_head == _tail) {
+        _head = _tail = nil;
+    } else {
+        _tail = _tail->_prev;
+        _tail->_next = nil;
+    }
+
+    // 将 _tail 尾部节点返回(更新前的_tail)
+    return tail;
+}
+```
+
+## objectForKey
+
+- 内部会调用`bringNodeToHead`, 下文分析
+
+```objc
+// YYMemoryCache.m
+- (id)objectForKey:(id)key {
+    if (!key) return nil;
+
+    // 锁：保证线程安全
+    pthread_mutex_lock(&_lock);
+    _YYLinkedMapNode *node = CFDictionaryGetValue(_lru->_dic, (__bridge const void *)(key));
+    if (node) {
+        // 更新 _time
+        node->_time = CACurrentMediaTime();
+        // 将节点移动到头部
+        [_lru bringNodeToHead:node];
+    }
+    pthread_mutex_unlock(&_lock);
+
+    // 将数据返回
+    return node ? node->_value : nil;
+}
+```
+
+## bringNodeToHead
+
+```objc
+// YYMemoryCache.m
+- (void)bringNodeToHead:(_YYLinkedMapNode *)node {
+    if (_head == node) return;
+    
+    if (_tail == node) {
+        _tail = node->_prev;
+        _tail->_next = nil;
+    } else {
+        node->_next->_prev = node->_prev;
+        node->_prev->_next = node->_next;
+    }
+    node->_next = _head;
+    node->_prev = nil;
+    _head->_prev = node;
+    _head = node;
 }
 ```
