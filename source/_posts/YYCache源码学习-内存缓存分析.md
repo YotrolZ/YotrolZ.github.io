@@ -256,7 +256,30 @@ YYMemoryCache对象与NSCache在以下几个方面有所不同:
 }
 ```
 
-### 异步释放对象的小技巧
+### 异步释放对象
+
+> `YYMemoryCacheGetReleaseQueue()`
+
+```objc
+static inline dispatch_queue_t YYMemoryCacheGetReleaseQueue() {
+    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
+}
+```
+
+- 使用了一个`低优先级(DISPATCH_QUEUE_PRIORITY_LOW)` 的 `全局并发队列`;
+- 使用 `static` `inline` 关键字已提高执行效率；
+
+> static inline 静态内联函数
+
+```
+通过声明一个内联函数，可以指示GCC更快地调用该函数。
+GCC可以做到这一点的一种方法是将该函数的代码集成到其调用者的代码中。
+这样可以消除函数调用的开销，从而加快执行速度。
+此外，如果任何实际参数值是恒定的，则它们的已知值可能会在编译时进行简化，因此不必包括所有内联函数的代码。
+对代码大小的影响难以预测。根据具体情况，使用函数内联可以使目标代码更大或更小。
+```
+*引用自：[An Inline Function is As Fast As a Macro](https://gcc.gnu.org/onlinedocs/gcc/Inline.html)*
+
 
 > 在`iOS 保持界面流畅的技巧`文章中作者提到:
 ```objc
@@ -276,6 +299,7 @@ dispatch_async(queue, ^{
     [tmp class];
 });
 ```
+
 
 ## removeTailNode
 
