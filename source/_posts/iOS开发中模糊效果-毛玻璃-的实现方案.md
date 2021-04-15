@@ -148,4 +148,4 @@ tags:
 @end
 ```
 
-![iOS8-模糊效果.gif](http://upload-images.jianshu.io/upload_images/590107-5fb845d54c0134a0.gif?imageMogr2/auto-orient/strip)
+![UIVisualEffectView-模糊效果](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/模糊效果/UIVisualEffectView.gif)
