@@ -11,7 +11,7 @@ tags:
 - [Apple官方说明](https://developer.apple.com/documentation/foundation/nsautoreleasepool)：一个用来支持引用计数内存管理系统的对象；
 
 <!-- more -->
-![NSAutoreleasePool](https://upload-images.jianshu.io/upload_images/590107-1991d31d02d6fea7.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![NSAutoreleasePool](https://cdn.jsdelivr.net/gh/yotrolz/image@master/blog/AutoreleasePool/NSAutoreleasePool.jpeg)
 
 > 从Apple官方文档中我们可以得出以下比较重要的几点
 * 如果你使用ARC，你不能直接`NSAutoreleasePool`，你可以使用`@autoreleasepool` block.
