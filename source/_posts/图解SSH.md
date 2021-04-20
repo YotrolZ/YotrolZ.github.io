@@ -1,5 +1,8 @@
 ---
 title: SSH原理及应用
+description: >-
+  最近在开发过程中发现，git pull/push 总是失败，一直以为是本地SSH相关key的问题，折腾一番始终不好使，最后才发现是Gitlab后台服务器的问题
+  顺便整理了一下关于SSH的东西
 abbrlink: 74ad770e
 date: 2021-03-16 15:13:20
 tags:
