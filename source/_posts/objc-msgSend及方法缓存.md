@@ -7,6 +7,8 @@ tags:
 
 大家都知道ObjC的消息机制，今天我们对底层一探究竟；
 
+<!-- more -->
+
 # objc_msgSend
 
 ```assembly
