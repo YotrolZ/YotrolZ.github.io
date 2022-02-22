@@ -1,5 +1,6 @@
 ---
 title: objc_msgSend及方法缓存
+abbrlink: 8367b1
 date: 2020-06-16 19:28:50
 tags:
 ---
